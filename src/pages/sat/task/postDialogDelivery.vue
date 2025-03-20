@@ -107,6 +107,7 @@ const cancelClickHandler = () => {
                   density="compact"
                   variant="outlined"
                   prepend-icon=""
+                  hide-actions="true"
                   label="Shipdate Confirmation"
                   :rules="[requiredValidator]"
                 />
