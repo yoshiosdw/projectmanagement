@@ -534,6 +534,12 @@ const paginationData = computed(()=>{
                   scope="col"
                   class="text-no-wrap"
                 >
+                  Business Unit
+                </th>
+                <th
+                  scope="col"
+                  class="text-no-wrap"
+                >
                   No. Ticket
                 </th>
                 <th
@@ -754,10 +760,13 @@ const paginationData = computed(()=>{
                   {{ data.person?.name || '' }}
                 </td> 
                 <td class="text-no-wrap">
-                  {{ data.team.name || '' }}
+                  {{ data.team?.name || '' }}
                 </td> 
                 <td class="text-no-wrap">
                   {{ data.project_department?.description || '' }}
+                </td> 
+                <td class="text-no-wrap">
+                  {{ data.biu?.name || '' }}
                 </td> 
                 <td class="text-no-wrap">
                   {{ data.ticket?.document_number || '' }}
