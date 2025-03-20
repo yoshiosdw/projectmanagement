@@ -165,6 +165,7 @@ const validateForm = () => {
                   label="Tanggal Produksi"
                   density="compact"
                   prepend-icon=""
+                  hide-actions="true"
                   clearable
                   variant="outlined"
                 />
