@@ -52,9 +52,10 @@ const getApprovalPerson = val => {
 
 const closeDialog = () => {
   isVisible.value = false
-
+  saved.value = false
   clearForm()
-  emit('closed', true)
+
+  // emit('closed', true)
 }
 
 const projectTeamLine = async id => {
@@ -90,6 +91,7 @@ const createTeam = async () => {
 
     // emit('saved', true)
     saved.value = true
+    sendData(ret)
 
     // isVisible.value = false
     // isVisibleLine.value = true
@@ -105,6 +107,10 @@ const createTeam = async () => {
   } finally {
     showLoading.value = false
   }
+}
+
+const sendData = val => {
+  emit('closed', val)
 }
 
 watchEffect(() => {
@@ -124,6 +130,11 @@ const validateFom = ()=>{
       createTeam()
     }
   })
+}
+
+const clearForm = () => {
+  name.value = ''
+  description.value = ''
 }
 
 const deleteData = async id => {
@@ -195,7 +206,7 @@ const btnDeleteClickHandler = id => {
               <VCol cols="4">
                 <VTextField
                   v-model="name"
-                  label="Name Project"
+                  label="Name Team"
                   :rules="[requiredValidator]"
                   :disabled="saved"
                 />
@@ -245,7 +256,7 @@ const btnDeleteClickHandler = id => {
                 <Person
                   :team-id="projectTeamId"
                   @employee="getApprovalPerson"
-                  @postSuccess="getSuccess"
+                  @post-success="getSuccess"
                 />
               </VCol>
             </VRow>
@@ -298,11 +309,11 @@ const btnDeleteClickHandler = id => {
                   </VBtn>
                 </td>
                 <td style="white-space: nowrap;">
-                  {{ data.employee?.person.name }}
+                  {{ data.employee?.person?.name }}
                 </td>
 
                 <td style="white-space: nowrap;">
-                  {{ data.employee?.person.nik }}
+                  {{ data.employee?.person?.nik }}
                 </td>
               </tr>
             </tbody>

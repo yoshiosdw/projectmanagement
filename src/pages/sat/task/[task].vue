@@ -10,6 +10,7 @@ import PostDialog from './postDialog.vue'
 import ProcessDialog from './processDialog.vue'
 import RejectDialog from './rejectDialog.vue'
 import RevisedDialog from './revisedDialog.vue'
+import PostDialogCopyDelivery from './postDialogDelivery.vue'
 
 const route = useRoute()
 const satId = ref(route.params.task)
@@ -506,7 +507,13 @@ const resolveAttachVariant = attachment => {
                           </VListItem> 
                         -->
 
-                        <VListItem v-if="(data.status === 0 || data.status === 2) && ability.can(data.permissions.split(' - ')[1], data.permissions.split(' - ')[0]) && (data.task_sequence === 4 || data.task_sequence === 6)">
+                        <VListItem v-if="(data.status === 0 || data.status === 2) && ability.can(data.permissions.split(' - ')[1], data.permissions.split(' - ')[0]) && (data.task_sequence === 4)">
+                          <PostDialogCopyDelivery
+                            :data="data"
+                            @task-uploaded="handlePostUpdated"
+                          /> 
+                        </VListItem>
+                        <VListItem v-if="(data.status === 0 || data.status === 2) && ability.can(data.permissions.split(' - ')[1], data.permissions.split(' - ')[0]) && (data.task_sequence === 6)">
                           <PostDialog
                             :data="data"
                             @task-uploaded="handlePostUpdated"
