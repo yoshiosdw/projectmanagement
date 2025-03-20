@@ -418,3 +418,11 @@ const validateFom = ()=>{
     -->
   </div>
 </template>
+
+<style>
+/* Menyembunyikan ikon kalender bawaan */
+.custom-date-field input::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+}
+</style>
