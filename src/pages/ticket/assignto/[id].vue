@@ -1,6 +1,6 @@
 <script setup>
 import { requiredValidator } from "@/@core/utils/validators"
-import { formatDateMySql, formatDateTimeMySql } from '@/@core/utils/formatters'
+import { formatDateMySql } from '@/@core/utils/formatters'
 import Person from '@/pages/ticket/person.vue'
 import axiosIns from '@/plugins/axios'
 import dayjs from 'dayjs'
@@ -8,6 +8,7 @@ import Swal from 'sweetalert2'
 import { ref, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { VDateInput } from 'vuetify/lib/labs/components.mjs'
+import { formatDateTimeMySql, getCurrentDateTimeWIB } from '@/@core/utils/formatters'
 
 const router = useRouter()
 const route = useRoute()
@@ -26,7 +27,7 @@ const ticketCategory = ref()
 const ticketSubCategory = ref()
 const attachment = ref()
 const priority = ref()
-const planStart = ref()
+const planStart = ref(getCurrentDateTimeWIB())
 const endTarget = ref()
 const person = ref()
 const description = ref()
@@ -59,7 +60,7 @@ const fetchTicket = async id => {
     ticketSubCategory.value = dataTicket.value.ticket_sub_categories.name
     attachment.value = dataTicket.value.attachment
     priority.value = dataTicket.value.priority
-    planStart.value = formatDateTimeMySql(dataTicket.value.plan_start)
+    planStart.value = getCurrentDateTimeWIB(dataTicket.value.plan_start)
     endTarget.value = formatDateTimeMySql(dataTicket.value.target_end)
     person.value = dataTicket.value.person_in_charge.person.name ? dataTicket.value.person_in_charge.person.name : '-'
     description.value = dataTicket.value.description
@@ -94,8 +95,8 @@ const update = async id => {
   showLoading.value = true
   try{
     let payload = {
-      plan_start: planStart.value||null,
-      target_end: endTarget.value||null,
+      plan_start: formatDateTimeMySql(planStart.value),
+      target_end: formatDateTimeMySql(endTarget.value)||null,
     }
 
     if (personId.value){
@@ -114,7 +115,7 @@ const update = async id => {
 
 
     // fetchAssign()
-    router.push('/home')
+    router.back()
 
     // showLoading.value = false
   } catch(error){
@@ -140,6 +141,10 @@ const fetchAssign = async () =>{
     showLoading.value = false
     console.log(error)
   }
+}
+
+const openDatePicker = event => {
+  event.target.showPicker() 
 }
 
 const goBack = () =>{
@@ -268,23 +273,25 @@ const goBack = () =>{
               />
             </VCol>
             <VCol cols="3">
-              <VDateInput
+              <VTextField
                 v-model="planStart"
-                prepend-icon
                 label="Plan Start"
-                density="compact"
-                :config="{enableTime: true, dateFormat: 'Y-m-d H:i', time_24hr: true, minDate:dayjs(new Date()).startOf('day').toDate()}"
-                :disabled="status == 9"
+                type="datetime-local"
+                density="comfortable"
+                variant="outlined"
+                class="custom-date-field"
+                @click="openDatePicker"
               />
             </VCol>
             <VCol cols="3">
-              <VDateInput
+              <VTextField
                 v-model="endTarget"
-                prepend-icon
-                label="Target End"
-                density="compact"
-                :config="{ enableTime: true, dateFormat: 'Y-m-d H:i', time_24hr: true, minDate:dayjs(new Date()).startOf('day').toDate()}"
-                :disabled="status == 9"
+                label="Plan Start"
+                type="datetime-local"
+                density="comfortable"
+                variant="outlined"
+                class="custom-date-field"
+                @click="openDatePicker"
               />
             </VCol>
             <VCol
