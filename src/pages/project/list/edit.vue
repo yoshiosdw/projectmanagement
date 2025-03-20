@@ -6,6 +6,7 @@ import { useToast } from 'vue-toastification'
 import router from '@/router'
 import { requiredValidator } from '@/@core/utils/validators'
 import Line from './line/[line].vue'
+import { getCurrentDateTimeWIB, formatDateTimeMySql } from '@/@core/utils/formatters'
 
 // import Person from '@/pages/ticket/person.vue'
 import Person from '@/pages/lookup/employee.vue'
@@ -38,7 +39,7 @@ const personId = ref()
 
 const name = ref()
 const description = ref()
-const planStart = ref(new Date())
+const planStart = ref(getCurrentDateTimeWIB())
 const planEnd = ref()
 const ActualStart = ref()
 const ActualEnd = ref()
@@ -62,6 +63,10 @@ const department = ref()
 const departmentOldId = ref()
 
 const projectLineData = ref()
+
+const openDatePicker = event => {
+  event.target.showPicker() 
+}
 
 const getApprovalPerson = val => {
  
@@ -181,8 +186,8 @@ const editProject = async id => {
       description     : description.value,
       priority_id     : priority.value.code || priorityOldId.value,
       assign_to       : personId.value || personOldId.value,
-      plan_start      : planStart.value,
-      plan_end        : planEnd.value,
+      plan_start      : formatDateTimeMySql(planStart.value),
+      plan_end        : formatDateTimeMySql(planEnd.value),
       actual_start    : ActualStart.value,
       actual_end      : ActualEnd.value,
       ticket_id       : ticketId.value || ticketIdOld.value,
@@ -353,19 +358,27 @@ const validateFom = ()=>{
             </VRow>
             <VRow>
               <VCol cols="4">
-                <VDateInput
+                <VTextField
                   v-model="planStart"
                   label="Plan Start"
+                  type="datetime-local"
                   :rules="[requiredValidator]"
-                  :config="{enableTime: true, dateFormat: 'Y-m-d H:i', time_24hr: true}"
+                  density="comfortable"
+                  variant="outlined"
+                  class="custom-date-field"
+                  @click="openDatePicker"
                 />
               </VCol>
               <VCol cols="4">
-                <VDateInput
+                <VTextField
                   v-model="planEnd"
                   label="Plan End"
+                  type="datetime-local"
                   :rules="[requiredValidator]"
-                  :config="{enableTime: true, dateFormat: 'Y-m-d H:i', time_24hr: true}"
+                  density="comfortable"
+                  variant="outlined"
+                  class="custom-date-field"
+                  @click="openDatePicker"
                 />
               </VCol>
             </VRow>
