@@ -56,8 +56,8 @@ const fetchProject = async (page, perPage, find) => {
     // getStatus.value = projects.value.project_status?.description
     total.value = ret.data.meta.total
     last.value = ret.data.meta.last
-    to.value = ret.data.meta.from
-    from.value = ret.data.meta.to
+    to.value = ret.data.meta.to
+    from.value = ret.data.meta.from
   } catch (error) {
     console.log(error)
     toast.error('Failed Load Data')
@@ -491,6 +491,12 @@ const paginationData = computed(()=>{
                   scope="col"
                   class="text-no-wrap"
                 >
+                  Progress
+                </th>
+                <th
+                  scope="col"
+                  class="text-no-wrap"
+                >
                   Priority
                 </th>
                 
@@ -709,6 +715,21 @@ const paginationData = computed(()=>{
                     </p>         
                   </div>               
                 </td>
+                <td>
+                  <VProgressLinear
+                    :model-value="parseInt(data.completion_percentage.percentage)"
+                    color="success"
+                    height="20"
+                    rounded
+                  >
+                    <template #default>
+                      <span
+                        class="text-black"
+                        style="font-weight: bold;"
+                      >{{ data.completion_percentage.percentage }}%</span>
+                    </template>
+                  </VProgressLinear>
+                </td>
                 <td class="text-no-wrap">
                   <VChip
                     variant="none"
@@ -809,6 +830,6 @@ const paginationData = computed(()=>{
 <route lang="yaml">
   meta:
     action: Read
-    subject: Person
+    subject: Project
     redirectIfLoggedIn: false
 </route>

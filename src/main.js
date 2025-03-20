@@ -24,6 +24,9 @@ import Pusher from 'pusher-js'
 
 import Toast, { POSITION, useToast } from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
+import socket from './socket'
+import { useEmailStore } from './views/apps/email/useEmailStore'
+
 
 let defaultOptions = { treeName: 'blocks-tree' }
 
@@ -72,6 +75,103 @@ const notificationsStore = useNotificationsStore()
 
 notificationsStore.setNotifications([])
 
+const toast = useToast()
+const emailStore = useEmailStore()
+
+
+// socket.on("emailSent", data => {
+//   console.log("Received emailSent event:", data)
+
+//   // const toast = useToast()
+  
+//   toast.success(`New email: ${data.subject}`, {
+//     timeout: 20000,
+//     onClick: () => {
+//       router.push({ path: `/emails/${data.id}` })
+//     },
+//     toastClassName: 'toast-notification',
+//   })
+
+//   emailStore.fetchEmails()
+
+//   notificationsStore.addNotification({
+//     id: data.id,
+//     message: `New email: ${data.subject}`,
+//     created_at: new Date().toISOString(),
+//     status: 0,
+//   })
+// })
+socket.on("notifSAT", data => {
+  console.log("🔍 processed_by_sat:", data?.processed_by)
+
+
+  if (
+    userData && 
+    (data.status_name === "Revoked" || (data.job_order?.created_by === userData.id)) && 
+    ability.can('Posting', 'BOA SAT Task')
+  ) {
+    console.log("✅ Syarat terpenuhi, menjalankan proses...")
+
+    const toast = useToast()
+    let toastMessage = data.status_name === "Revoked" ? "SAT REVOKED" : "SAT REJECTED"
+
+    toast.info(toastMessage, { timeout: 20000, toastClassName: 'toast-notification' })
+
+    let postData = data.status_name === "Revoked"
+      ? {
+        sat_number: data?.document_number,
+        jo_number: data?.bill_number,
+        job_order_task_id: data?.job_order_task?.id,
+        note_sat: data?.job_order_task?.note,
+        created_by_sat: data?.created_by,
+        processed_by_sat: data?.processed?.person?.name,
+        status_sat: data?.status_name,
+      }
+      : {
+        sat_number: data?.job_order?.document_number,
+        jo_number: data?.job_order?.bill_number,
+        job_order_task_id: data?.id,
+        note_sat: data?.note,
+        created_by_sat: data?.job_order?.created_by,
+        processed_by_sat: data?.processed?.person?.name,
+        status_sat: data?.status_name,
+      }
+
+    console.log("🔄 Mengirim data ke server:", postData)
+
+    axiosIns.post('/notifications', postData)
+      .then(response => {
+        console.log("✅ Data berhasil dikirim:", response.data)
+        notificationsStore.notifTrigger++
+      })
+      .catch(error => {
+        console.error("❌ Gagal mengirim data:", error.response?.data || error.message)
+      })
+
+    let notifData = data.status_name === "Revoked"
+      ? {
+        id: data.id, 
+        from: data?.processed?.person?.name,
+        NomerSat: data?.document_number,
+        created_at: data?.updated_at, 
+        message: data?.status_name,
+      }
+      : {
+        id: data.id, 
+        from: data?.processed?.person?.name,
+        NomerSat: data?.job_order?.document_number,
+        created_at: data.updated_at, 
+        message: data.status_name,
+      }
+
+    console.log("📩 Menambahkan notifikasi ke store:", notifData)
+    
+    notificationsStore.addNotifSAT(notifData)
+
+  } else {
+    console.warn("⚠️ Syarat tidak terpenuhi, toast tidak ditampilkan.")
+  }
+})
 
 // Listen for Pusher events
 window.Echo.channel('tickets')
@@ -156,7 +256,7 @@ window.Echo.channel('tickets')
         ticket_number: data.documentNumber,
         message: 'Assign To Me',
         department: data.department || '-',
-        person_in_charge_id: data.personInChargeId,
+        person_in_charge_id: data?.personInChargeId,
         ticket_id: data.ticketId,
       }, {
         

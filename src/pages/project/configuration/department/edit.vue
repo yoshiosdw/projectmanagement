@@ -17,6 +17,8 @@ const props = defineProps({
 const emit = defineEmits(['saved', 'closed'])
 const route = useRoute()
 
+const waiting = ref(false)
+
 // const departmentId = computed(() => props.headerId)
 const departmentId = ref(props.headerId)
 
@@ -93,9 +95,14 @@ const modifyTeam = async id => {
   }
 }
 
-watchEffect(() => {
+// watchEffect(() => {
+//   fetchDepartment(departmentId.value)
+// })
+
+const setWaitingTrue = () => {
+  waiting.value = true
   fetchDepartment(departmentId.value)
-})
+}
 
 
 const validateFom = ()=>{
@@ -121,6 +128,7 @@ const validateFom = ()=>{
           v-bind="activatorProps"
           :size="22"
           icon="tabler-edit"
+          @click="setWaitingTrue"
         />
       </template>
       <DialogCloseBtn @click="closeDialog" />

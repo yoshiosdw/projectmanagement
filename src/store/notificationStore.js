@@ -4,6 +4,8 @@ import { defineStore } from 'pinia'
 export const useNotificationsStore = defineStore('notifications', {
   state: () => ({
     notifications: [],
+    notifSATList: [],
+    notifTrigger: 0,
   }),
   getters: {
     filteredNotifications(state) {
@@ -13,6 +15,11 @@ export const useNotificationsStore = defineStore('notifications', {
       const { role, id: userId } = userData
 
       return state.notifications.filter(notification => {
+        // if (ability.can('Posting', 'BOA SAT Task')) {
+        //   // 🛑 Sembunyikan notifikasi yang memiliki ticket
+        //   return !notification.ticket_id
+        // }
+
         if (role === 'ICT Staff') {
           if (ability.can('Manage', 'ICT Ticket') && notification.message === 'Assign To Me') {
             return notification.person_in_charge_id === userId && notification.status === 0
@@ -28,14 +35,30 @@ export const useNotificationsStore = defineStore('notifications', {
     notificationsCount(state) {
       return this.filteredNotifications.length
     },
+    notifSATCount(state) {
+      return state.notifSATList.length
+    },
   },
   actions: {
     addNotification(notification) {
       this.notifications = [notification, ...this.notifications]
+      this.notifTrigger++
+    },
+    addNotifSAT(notifSAT) {
+      this.notifSATList = [notifSAT, ...this.notifSATList] 
+      
+      console.log('Updated notifSATList:', this.notifSATList) 
+      this.notifTrigger++
     },
     setNotifications(notifications) {
       this.notifications = notifications
     },
+
+    setNotifSATList(notifications) {
+      this.notifSATList = notifications
+      console.log('Updated notifSATList:', this.notifSATList) // Logging untuk debugging
+    },
+    
     clearNotifications() {
       this.notifications = []
     },

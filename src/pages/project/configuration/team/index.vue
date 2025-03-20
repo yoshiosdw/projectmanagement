@@ -40,8 +40,8 @@ const fetchTeam = async (page, perPage, find) => {
     
     total.value = ret.data.meta.total
     last.value = ret.data.meta.last
-    to.value = ret.data.meta.from
-    from.value = ret.data.meta.to
+    to.value = ret.data.meta.to
+    from.value = ret.data.meta.from
   } catch (error) {
     console.log(error)
     toast.error('Failed Load Data')
@@ -103,6 +103,12 @@ const getClosed = closed => {
   }
 }
 
+const getSaved = saved => {
+  if(saved){
+    fetchTeam(page.value, perPage.value, find.value)
+  }
+}
+
 const paginationData = computed(()=>{
   const firstIndex = page.value == 1 ? 1 : perPage.value * page.value + 1
   const lastIndex = page.value * perPage.value
@@ -132,7 +138,7 @@ const paginationData = computed(()=>{
               />
               <Add
                 @closed="getClosed"
-                @saved="fetchTeam(page.value, perPage.value, find.value)"
+                @saved="getSaved"
               />
             </VCardText>
           </VCol>
@@ -164,8 +170,8 @@ const paginationData = computed(()=>{
             </thead>
             <tbody>
               <tr
-                v-for="(data, index) in team"
-                :key="index"
+                v-for="data in team"
+                :key="data.id"
               >
                 <td class="text-no-wrap">
                   <VBtn

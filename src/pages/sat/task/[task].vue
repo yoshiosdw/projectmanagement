@@ -382,6 +382,9 @@ const resolveAttachVariant = attachment => {
                 Request Date
               </th>
               <th scope="col">
+                Processed By
+              </th>
+              <th scope="col">
                 Note
               </th>
               <th scope="col">
@@ -420,6 +423,12 @@ const resolveAttachVariant = attachment => {
                   <p>{{ formatDateMySql(data.confirmation_date) }}</p>
                 </div>
               </td>
+              <td>
+                <div class="d-flex flex-column">
+                  <p>{{ data.user?.person?.name || '' }}</p>
+                </div>
+              </td>
+
               <td>
                 <div class="d-flex flex-column">
                   <p>{{ data.note }}</p>
@@ -521,19 +530,21 @@ const resolveAttachVariant = attachment => {
                             @task-uploaded="handlePostUpdated"
                           />
                         </VListItem>
-                        <VListItem
+                        <!--
+                          <VListItem
                           v-if="data.status === 1 && data.task_sequence > 4 && ability.can('Revoked', 'PPIC SAT Task')"
                           value="user"
                           @click="btnRevokeClickHandler(data.id)"
-                        >
+                          >
                           <VIcon
-                            color="error"
-                            size="24"
-                            class="me-3"
-                            icon="tabler-copy-x"
+                          color="error"
+                          size="24"
+                          class="me-3"
+                          icon="tabler-copy-x"
                           />
                           <ListItemTitle>Revoked</ListItemTitle>
-                        </VListItem>
+                          </VListItem> 
+                        -->
                       </VList>
                     </VMenu>
                   </VBtn>

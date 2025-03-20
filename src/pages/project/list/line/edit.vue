@@ -6,7 +6,7 @@ import { watchEffect } from 'vue'
 import { useToast } from 'vue-toastification'
 
 // import Person from '@/pages/ticket/person.vue'
-import Person from '@/pages/lookup/employee.vue'
+import Person from '@/pages/lookup/employeeByTeam.vue'
 
 const props = defineProps({
   headerId: {
@@ -14,6 +14,10 @@ const props = defineProps({
     required: true,
   },
   projectId: {
+    type: String,
+    required: true,
+  },
+  projectTeam: {
     type: String,
     required: true,
   },
@@ -240,6 +244,7 @@ const validateFom = ()=>{
                 :rules="[requiredValidator]"
               />
               <Person
+                :project-team="props.projectTeam"
                 @employee="getApprovalPerson"
               />
             </VCol>

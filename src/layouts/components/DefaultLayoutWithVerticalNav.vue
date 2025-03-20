@@ -21,13 +21,14 @@ const getUserData = () => {
   const userData = JSON.parse(localStorage.getItem('sinarjoUserData'))
   if (userData && userData.roles) {
     showNavBarNotifications.value = userData.roles.some(role => 
-      role.name === 'administrator' || role.name === 'ICT Staff',
+      role.name === 'administrator' || role.name === 'ICT Staff' || role.name === 'BOA Staff' || role.name === 'PPIC' || role.name === 'RND SM Staff' ,
     )
   }
 }
 
 onMounted(() => {
   getUserData()
+  console.log('Show NavBar Notifications:', showNavBarNotifications.value)
 })
 </script>
 

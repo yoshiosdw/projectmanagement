@@ -54,7 +54,7 @@ const chartConfigs = computed(() => {
     {
       chartOptions: {
         chart: {
-          height: 350,
+          height: 450,
           type: 'area',  // Changed to 'area' for smooth spline effect
           toolbar: { show: false },
         },
@@ -167,14 +167,17 @@ const chartConfigs = computed(() => {
 </script>
 
 <template>
-  <VCard
-    class="text-center"
-    title="3 Month Last Projects"
-  >
+  <VCard>
+    <VCardTitle
+      class="  text-center"
+    >
+      3 Month Last Projects
+    </VCardTitle>
     <VDivider />
     <VCardText>
       <VueApexCharts
-        ref="refVueApexChart"
+        ref="
+      refVueApexChart"
         :key="currentTab"
         :options="chartConfigs[Number(currentTab)].chartOptions"
         :series="chartConfigs[Number(currentTab)].series"

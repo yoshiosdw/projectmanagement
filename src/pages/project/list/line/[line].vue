@@ -233,6 +233,8 @@ const getClosedDialog = closed => {
   if(closed){
     console.log(closed)
     isEdit.value = false
+
+    fetchProjectLine(projectId.value, page.value, perPage.value, find.value)
   }
 }
 
@@ -281,9 +283,9 @@ const prioritycolor = description => {
       text: 'Highest',
       icon: 'tabler:chevrons-up', color: 'error',
     }
-  } else if (description === 'Height') {
+  } else if (description === 'Hight') {
     return {
-      text: 'Height',
+      text: 'Hight',
       icon: 'tabler:chevron-up', color: 'error',
     }
   } else if (description === 'Medium') {
@@ -841,6 +843,7 @@ const btnHoldHandler = id => {
         v-if="isEdit"
         :project-id="projectId"
         :header-id="projectLineId"
+        :project-team="projectTeamId"
         @saved="getSavedEditLine"
         @closed="getClosedDialog"
       />
@@ -851,6 +854,6 @@ const btnHoldHandler = id => {
 <route lang="yaml">
   meta:
     action: Read
-    subject: Person
+    subject: Project
     redirectIfLoggedIn: false
 </route>
