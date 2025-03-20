@@ -809,6 +809,6 @@ const paginationData = computed(()=>{
 <route lang="yaml">
   meta:
     action: Read
-    subject: Person
+    subject: Project
     redirectIfLoggedIn: false
 </route>

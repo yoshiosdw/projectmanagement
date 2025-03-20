@@ -281,9 +281,9 @@ const prioritycolor = description => {
       text: 'Highest',
       icon: 'tabler:chevrons-up', color: 'error',
     }
-  } else if (description === 'Height') {
+  } else if (description === 'Hight') {
     return {
-      text: 'Height',
+      text: 'Hight',
       icon: 'tabler:chevron-up', color: 'error',
     }
   } else if (description === 'Medium') {
@@ -851,6 +851,6 @@ const btnHoldHandler = id => {
 <route lang="yaml">
   meta:
     action: Read
-    subject: Person
+    subject: Project
     redirectIfLoggedIn: false
 </route>

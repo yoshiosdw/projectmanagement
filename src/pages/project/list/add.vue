@@ -261,6 +261,9 @@ const clearForm = () => {
   person.value = null
   planStart.value = new Date()
   planEnd.value = null
+  biu.value = null
+  teamId.value = null
+  teamName.value = null
 }
 
 const validateFom = ()=>{
