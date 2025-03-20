@@ -30,7 +30,7 @@ export default [
     children: [
       {
         title: 'Dashboard',
-        to: { name: 'sat-home'},
+        to: { name: 'sat-dashboard'},
         subject:'SAT',
         action:'Read',
       },
