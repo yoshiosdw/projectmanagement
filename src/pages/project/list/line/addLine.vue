@@ -8,6 +8,7 @@ import { useToast } from 'vue-toastification'
 // import Person from '@/pages/ticket/person.vue'
 // import Person from '@/pages/lookup/employee.vue'
 import Person from '@/pages/lookup/employeeByTeam.vue'
+import { formatDateTimeMySql, getCurrentDateTimeWIB } from '@/@core/utils/formatters'
 
 
 const props = defineProps({
@@ -35,7 +36,7 @@ const refForm = ref()
 
 const showLoading = ref(false)
 
-const planStartLine = ref(new Date())
+const planStartLine = ref(getCurrentDateTimeWIB())
 const planEndLine = ref()
 const ActualStartLine = ref()
 const ActualEndLine = ref()
@@ -52,6 +53,9 @@ const projectStatus = ref()
 
 const projectTeam = ref(props.projectTeam)
 
+const openDatePicker = event => {
+  event.target.showPicker() 
+}
 
 const getApprovalPerson = val => {
  
@@ -123,8 +127,8 @@ const createProjectLine = async () => {
       type_id         : typeLine.value,
       priority_id     : priorityLine.value,
       assign_to       : personLineId.value,
-      plan_start      : planStartLine.value,
-      plan_end        : planEndLine.value,
+      plan_start      : formatDateTimeMySql(planStartLine.value),
+      plan_end        : formatDateTimeMySql(planEndLine.value),
 
       // actual_start    : ActualStartLine.value,
       // actual_end      : ActualEndLine.value,
@@ -248,19 +252,27 @@ const validateFom = ()=>{
           </VRow>
           <VRow>
             <VCol cols="3">
-              <VDateInput
+              <VTextField
                 v-model="planStartLine"
-                label="Plan Start"
-                :rules="[requiredValidator]"
-                :config="{enableTime: true, dateFormat: 'Y-m-d H:i', time_24hr: true}"
+                  label="Plan Start"
+                  type="datetime-local"
+                  :rules="[requiredValidator]"
+                  density="comfortable"
+                  variant="outlined"
+                  class="custom-date-field"
+                  @click="openDatePicker"
               />
             </VCol>
             <VCol cols="3">
-              <VDateInput
+              <VTextField
                 v-model="planEndLine"
-                label="Plan End"
-                :rules="[requiredValidator]"
-                :config="{enableTime: true, dateFormat: 'Y-m-d H:i', time_24hr: true}"
+                  label="Plan Start"
+                  type="datetime-local"
+                  :rules="[requiredValidator]"
+                  density="comfortable"
+                  variant="outlined"
+                  class="custom-date-field"
+                  @click="openDatePicker"
               />
             </VCol>
             <!--
@@ -307,3 +319,11 @@ const validateFom = ()=>{
     </VCard>
   </VDialog>
 </template>
+
+<style>
+/* Menyembunyikan ikon kalender bawaan */
+.custom-date-field input::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+}
+</style>
