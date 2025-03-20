@@ -53,6 +53,7 @@ const from = ref(1)
 const to = ref(10)
 const lineData = ref()
 
+const waiting = ref(false)
 
 const getApprovalPerson = val => {
  
@@ -139,16 +140,16 @@ const modifyTeam = async id => {
 
   } catch (error) {
     console.log(error)
-    toast.error('Failed create data')
+    toast.error('Failed Update data')
   } finally {
     showLoading.value = false
   }
 }
 
-watchEffect(() => {
-  projectTeam(projectId.value),
-  projectTeamLine(projectId.value)
-})
+// watchEffect(() => {
+//   projectTeam(projectId.value),
+//   projectTeamLine(projectId.value)
+// })
 
 const getSuccess = () => {
   projectTeamLine(projectId.value)
@@ -197,6 +198,12 @@ const btnDeleteClickHandler = id => {
     }
   })
 }
+
+const setWaitingTrue = () => {
+  waiting.value = true
+  projectTeam(projectId.value)
+  projectTeamLine(projectId.value)
+}
 </script>
 
 <template>
@@ -213,6 +220,7 @@ const btnDeleteClickHandler = id => {
           v-bind="activatorProps"
           :size="22"
           icon="tabler-edit"
+          @click="setWaitingTrue"
         />
       </template>
       <DialogCloseBtn @click="closeDialog" />
