@@ -59,7 +59,9 @@ const chartConfigs = computed(() => {
         colors: [
           '#008000', 
           '#90EE90', 
-          '#FFFF00', 
+
+          // '#FFFF00', 
+          '#FFD700',
           '#FFC0CB', 
           '#FF0000', 
         ],
@@ -139,11 +141,11 @@ const chartConfigs = computed(() => {
       series: [
         {
           data: [
-            allData.value.total_lowest,
-            allData.value.total_low,
-            allData.value.total_medium,
-            allData.value.total_height,
-            allData.value.total_heigest,
+            allData.value.total_lowest || 0,
+            allData.value.total_low || 0,
+            allData.value.total_medium || 0,
+            allData.value.total_height || 0,
+            allData.value.total_heigest || 0,
           ],
         },
       ],

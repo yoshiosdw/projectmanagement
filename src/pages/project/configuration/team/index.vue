@@ -40,8 +40,8 @@ const fetchTeam = async (page, perPage, find) => {
     
     total.value = ret.data.meta.total
     last.value = ret.data.meta.last
-    to.value = ret.data.meta.from
-    from.value = ret.data.meta.to
+    to.value = ret.data.meta.to
+    from.value = ret.data.meta.from
   } catch (error) {
     console.log(error)
     toast.error('Failed Load Data')

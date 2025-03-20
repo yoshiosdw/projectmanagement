@@ -13,6 +13,7 @@ import { watchEffect } from 'vue'
 import Swal from 'sweetalert2'
 import axiosIns from '@/plugins/axios'
 import Monthly from './dashboard/monthly.vue'
+import BiuCount from './dashboard/byBiu.vue'
 
 const inprogress = ref([])
 const todo = ref([])
@@ -167,6 +168,12 @@ watchEffect(() => {
         :last-month-three="lastMonthThree"
       />
     </VCol> 
+    <VCol
+      cols="6"
+      md="6"
+    >
+      <BiuCount />
+    </VCol>
   </VRow>
 </template>
 
