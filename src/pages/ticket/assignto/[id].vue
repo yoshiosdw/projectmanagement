@@ -286,7 +286,7 @@ const goBack = () =>{
             <VCol cols="3">
               <VTextField
                 v-model="endTarget"
-                label="Plan Start"
+                label="Plan End"
                 type="datetime-local"
                 density="comfortable"
                 variant="outlined"

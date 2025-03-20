@@ -155,7 +155,6 @@ const openDatePicker = event => {
     <VCol cols="12">
       <VCard>
         <VCardTitle>Ticket Detail</VCardTitle>
-        {{ planStart }}
         <VCardText class="mt-3" />
         <VForm>
           <VRow
