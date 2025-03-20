@@ -5,6 +5,7 @@ import axiosIns from "@/plugins/axios"
 import { onMounted, ref } from "vue"
 import { useToast } from "vue-toastification"
 import Report from "./report.vue"
+import { VDateInput } from "vuetify/lib/labs/components.mjs"
 
 const toast = useToast()
 const typelabels = ref([])
@@ -159,11 +160,13 @@ const validateForm = () => {
               </VCol>
     
               <VCol cols="3">
-                <AppDateTimePicker
+                <VDateInput
                   v-model="productionDate"
                   label="Tanggal Produksi"
                   density="compact"
+                  prepend-icon=""
                   clearable
+                  variant="outlined"
                 />
               </VCol>
               
