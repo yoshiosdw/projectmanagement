@@ -11,7 +11,6 @@ import Resume from './detail/resume.vue'
 import { useTicket } from './useTicketStore'
 import { VDateInput } from 'vuetify/lib/labs/components.mjs'
 
-
 const router = useRouter()
 const ticketStore = useTicket()
 const tickets = ref()
@@ -73,9 +72,8 @@ const fetchTicket = async (page, perPage, find, selectedType, selectedDepartment
         type: selectedType,
         department_in_charge: selectedDepartment,
         status_name: status || null,
-        fromdate: formatDateMySql(fromdate),
-        fromdate: formatDateMySql(fromdate),
-        ...(todate ? { todate: formatDateMySql(todate) } : {}),
+        fromdate: fromdate ? new Date(fromdate).toISOString().split("T")[0] : null ,
+        todate: todate ? new Date(todate).toISOString().split("T")[0] : null,
       },
     })
 
@@ -120,15 +118,19 @@ const openAttachment = async attachmentUrl => {
 const selectedStatus = ref(null)
 
 const handleStatusClicked = status => {
-  selectedStatus.value = status
+  // selectedStatus.value = status
+
+  // Jika status yang diklik sama dengan yang sudah dipilih, reset ke null
+  selectedStatus.value = selectedStatus.value === status ? null : status
   sessionStorage.setItem('selectedStatus', status)
   if(selectedStatus.value){
-    selectedType.value = '' || null
+    // selectedType.value = '' || null
+    selectedType.value = selectedType.value || null
   }
   else{
     selectedType.value = null
   }
-  fetchTicket(page.value, perPage.value, find.value, null, selectedDepartment.value, selectedStatus.value, fromdate.value, todate.value)
+  fetchTicket(page.value, perPage.value, find.value, selectedType.value,  selectedDepartment.value, selectedStatus.value, fromdate.value, todate.value)
 }
 
 watchEffect(() => {
@@ -202,7 +204,6 @@ watchEffect(() => {
     fetchTicketCategory(page.value, perPage.value, null)
   }
 })
-
 
 // watchEffect(() => {
 //   fetchTicket(page.value, perPage.value, find.value, selectedType.value, selectedDepartment.value, status)
@@ -622,6 +623,11 @@ const closeDialog = () => {
   dialogVisible.value = false
 }
 
+const handleClear = () => {
+  fromDate.value = null
+  toDate.value = null
+}
+
 
 const validateAddNewTicket = () => {
   const hasInvalidTicket = tickets.value.some(ticket => ticket.status === 4 && ticket.score === null)
@@ -834,7 +840,13 @@ const downloadFile = async filename => {
   <VRow>
     <VCol cols="12">
       <VOverlay v-model="loading" />
-      <Resume @status-clicked="handleStatusClicked" />
+      <Resume
+        :type-name="selectedType" 
+        :depart-name="selectedDepartment"
+        :from-date="fromdate"
+        :to-date="todate"
+        @status-clicked="handleStatusClicked"
+      />
       <VSpacer class="mt-5" />
       <VCard :loading="loading">
         <!-- {{ highlightedDocumentNumber }} -->
@@ -898,7 +910,6 @@ const downloadFile = async filename => {
                   item-text="text" 
                   item-title="name"
                   clearable
-                  style="height: 40px;"
                 />
               </div>
               <div
@@ -912,7 +923,6 @@ const downloadFile = async filename => {
                   item-text="text" 
                   item-title="department_in_charge"
                   clearable
-                  style="height: 40px;"
                 />
               </div>
               <VDateInput
@@ -921,6 +931,7 @@ const downloadFile = async filename => {
                 class="calender-date-picker"
                 density="compact"
                 prepend-icon
+                variant="outlined"
                 clearable
                 :config="{dateFormat: 'Y-m-d'}"
               />
@@ -930,6 +941,7 @@ const downloadFile = async filename => {
                 class="calender-date-picker"
                 density="compact"
                 prepend-icon
+                variant="outlined"
                 clearable
                 :config="{dateFormat:'Y-m-d'}"
               />
@@ -944,7 +956,7 @@ const downloadFile = async filename => {
         </VRow>
 
        
-        <VCardText style="margin-top: 0;">
+        <VCardText>
           <VTable>
             <thead
               class="text-uppercase"
@@ -974,14 +986,20 @@ const downloadFile = async filename => {
                 <th scope="col">
                   Requestor
                 </th>
+                <th scope="col">
+                  Description
+                </th>
+
+                
+
                 <!--
                   <th scope="col">
                   Extention
                   </th> 
                 -->
-                <th scope="col">
-                  Description
-                </th>
+
+
+
                 <!--
                   <th scope="col">
                   Department in Charge
@@ -992,6 +1010,27 @@ const downloadFile = async filename => {
                 </th>
                 <th scope="col">
                   Attachment
+                </th>
+
+                <th scope="col">
+                  Submited Date
+                </th>
+                <th scope="col">
+                  Approved Date
+                </th>
+
+                <th scope="col">
+                  Plan Start
+                </th>
+                <th scope="col">
+                  Plan End
+                </th>
+
+                <th scope="col">
+                  Actual Start
+                </th>
+                <th scope="col">
+                  Actual End
                 </th>
               </tr>
             </thead>
@@ -1230,7 +1269,9 @@ const downloadFile = async filename => {
                     </VChip>            
                   </div>               
                 </td>
+
                 <!-- <td style="min-width: 300px; word-wrap: break-word;"> -->
+
                 <td style="min-width: 20px; word-wrap: break-word;">
                   {{ data.ticket_types.name }}
                 </td>
@@ -1239,11 +1280,18 @@ const downloadFile = async filename => {
                   <br>
                   Ext No:{{ data.extension_number }}
                 </td>
-                <!-- <td>{{ data.extension_number }}</td> -->
                 <td style="min-width: 300px; word-wrap: break-word;">
                   {{ data.description }}
                 </td>
+
+                
+
+                <!-- <td>{{ data.extension_number }}</td> -->
+
+
+
                 <!-- <td>{{ data.ticket_categories.department_in_charge }}</td> -->
+
                 <td class="text-no-wrap">
                   {{ data.person_in_charge && data.person_in_charge.person ? data.person_in_charge.person.name : '-' }}
                   <br>
@@ -1268,6 +1316,86 @@ const downloadFile = async filename => {
                       {{ data.attachment }}
                     </template>
                   </div>
+                </td>
+                <!--
+                  <td style="min-width: 150px;">
+                  {{ data.submitted_date ? new Date(data.submitted_date).toLocaleString('id-ID', { 
+                  timeZone: 'Asia/Jakarta', 
+                  year: 'numeric', 
+                  month: '2-digit', 
+                  day: '2-digit', 
+                  hour: '2-digit', 
+                  minute: '2-digit', 
+                  second: '2-digit' 
+                  }).replace(',', '').replace(/\//g, '-') : '' }}
+                  </td>
+
+                  <td style="min-width: 150px;">
+                  {{ data.approved_date ? new Date(data.approved_date).toLocaleString('id-ID', { 
+                  timeZone: 'Asia/Jakarta', 
+                  year: 'numeric', 
+                  month: '2-digit', 
+                  day: '2-digit', 
+                  hour: '2-digit', 
+                  minute: '2-digit', 
+                  second: '2-digit' 
+                  }).replace(',', '').replace(/\//g, '-') : '' }}
+                  </td>
+                -->
+
+                <td style="min-width: 150px;">
+                  {{ new Date(data.submitted_date).toISOString().split('T')[0].replace(/-/g, '/') }}
+                </td> 
+                <td style="min-width: 150px;">
+                  {{ data.approved_date ? new Date(data.approved_date).toISOString().split('T')[0].replace(/-/g, '/') : '' }}
+                </td> 
+
+                <td style="min-width: 230px;">
+                  {{ data.plan_start ? new Date(data.plan_start).toLocaleString('id-ID', { 
+                    timeZone: 'Asia/Jakarta', 
+                    year: 'numeric', 
+                    month: '2-digit', 
+                    day: '2-digit', 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit' 
+                  }).replace(',', '').replace(/\//g, '-') : '' }}
+                </td>
+
+                <td style="min-width: 230px;">
+                  {{ data.target_end ? new Date(data.target_end).toLocaleString('id-ID', { 
+                    timeZone: 'Asia/Jakarta', 
+                    year: 'numeric', 
+                    month: '2-digit', 
+                    day: '2-digit', 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit' 
+                  }).replace(',', '').replace(/\//g, '-') : '' }}
+                </td>
+
+                <td style="min-width: 230px;">
+                  {{ data.start_at ? new Date(data.start_at).toLocaleString('id-ID', { 
+                    timeZone: 'Asia/Jakarta', 
+                    year: 'numeric', 
+                    month: '2-digit', 
+                    day: '2-digit', 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit' 
+                  }).replace(',', '').replace(/\//g, '-') : '' }}
+                </td>
+
+                <td style="min-width: 230px;">
+                  {{ data.end_at ? new Date(data.end_at).toLocaleString('id-ID', { 
+                    timeZone: 'Asia/Jakarta', 
+                    year: 'numeric', 
+                    month: '2-digit', 
+                    day: '2-digit', 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit' 
+                  }).replace(',', '').replace(/\//g, '-') : '' }}
                 </td>
               </tr>
             </tbody>
@@ -1632,7 +1760,7 @@ const downloadFile = async filename => {
               <VForm>
                 <VRow>
                   <VCol cols="12">
-                    <VDateInput
+                    <AppDateTimePicker
                       v-model="startDate"
                       label="Start Date Ticket"
                       class="calender-date-picker"
@@ -1684,7 +1812,7 @@ const downloadFile = async filename => {
                   mt="4"
                   cols="12"
                 >
-                  <VDateInput
+                  <AppDateTimePicker
                     v-model="endDate"
                     label="End Date Ticket"
                     class="calender-date-picker"
