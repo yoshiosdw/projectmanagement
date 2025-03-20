@@ -233,6 +233,8 @@ const getClosedDialog = closed => {
   if(closed){
     console.log(closed)
     isEdit.value = false
+
+    fetchProjectLine(projectId.value, page.value, perPage.value, find.value)
   }
 }
 
@@ -841,6 +843,7 @@ const btnHoldHandler = id => {
         v-if="isEdit"
         :project-id="projectId"
         :header-id="projectLineId"
+        :project-team="projectTeamId"
         @saved="getSavedEditLine"
         @closed="getClosedDialog"
       />

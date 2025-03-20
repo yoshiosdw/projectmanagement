@@ -491,6 +491,12 @@ const paginationData = computed(()=>{
                   scope="col"
                   class="text-no-wrap"
                 >
+                  Progress
+                </th>
+                <th
+                  scope="col"
+                  class="text-no-wrap"
+                >
                   Priority
                 </th>
                 
@@ -708,6 +714,21 @@ const paginationData = computed(()=>{
                       {{ data.info_project }}
                     </p>         
                   </div>               
+                </td>
+                <td>
+                  <VProgressLinear
+                    :model-value="parseInt(data.completion_percentage.percentage)"
+                    color="success"
+                    height="20"
+                    rounded
+                  >
+                    <template #default>
+                      <span
+                        class="text-black"
+                        style="font-weight: bold;"
+                      >{{ data.completion_percentage.percentage }}%</span>
+                    </template>
+                  </VProgressLinear>
                 </td>
                 <td class="text-no-wrap">
                   <VChip
