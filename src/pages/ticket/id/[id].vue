@@ -6,6 +6,7 @@ import dayjs from 'dayjs'
 import Swal from 'sweetalert2'
 import { ref, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { formatDateTimeMySql, getCurrentDateTimeWIB } from '@/@core/utils/formatters'
 
 const router = useRouter()
 
@@ -26,7 +27,7 @@ const targetMinute = ref(0)
 const extension_number = ref()
 const ip_address = ref()
 const priority = ref()
-const plantStart = ref()
+const plantStart = ref(getCurrentDateTimeWIB())
 const endTarget = ref()
 const description = ref()
 const startAt = ref()
@@ -181,7 +182,9 @@ watch(ticketCategory, idCategory => {
   showLoading.value=false
 })
 
-
+const openDatePicker = event => {
+  event.target.showPicker() 
+}
 
 // watchEffect(() => {
 //   if (ticket.value && ticket.value.status_name === 'Rejected') {
@@ -432,21 +435,27 @@ const validateAndApprove = () => {
                 />
               </VCol>
               <VCol cols="3">
-                <VDateInput
+                <VTextField
                   v-model="plantStart"
                   label="Plan Start"
-                  density="compact"
-                  :config="{ enableTime: true, dateFormat: 'Y-m-d H:i', time_24hr: true, minDate:new Date()}"
-                  :disabled="status == 9"
+                  type="datetime-local"
+                  :rules="[requiredValidator]"
+                  density="comfortable"
+                  variant="outlined"
+                  class="custom-date-field"
+                  @click="openDatePicker"
                 />
               </VCol>
               <VCol cols="3">
-                <VDateInput
+                <VTextField
                   v-model="endTarget"
-                  label="Target End"
-                  density="compact"
-                  :config="{ enableTime: true, dateFormat: 'Y-m-d H:i', time_24hr: true, minDate: new Date()}"
-                  :disabled="status == 9"
+                  label="Plan End"
+                  type="datetime-local"
+                  :rules="[requiredValidator]"
+                  density="comfortable"
+                  variant="outlined"
+                  class="custom-date-field"
+                  @click="openDatePicker"
                 />
               </VCol>
 

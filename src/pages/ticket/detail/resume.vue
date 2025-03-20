@@ -1,7 +1,26 @@
 <script setup>
 import axiosIns from '@/plugins/axios'
 import Swal from 'sweetalert2'
-import { defineEmits, onMounted, ref } from 'vue'
+import { defineEmits, onMounted, ref, watchEffect } from 'vue'
+
+const props = defineProps({
+  typeName: {
+    type: String,
+    required: true,
+  },
+  departName: {
+    type: String,
+    required: true,
+  },
+  fromDate: {
+    type: String,
+    required: true,
+  },
+  toDate: {
+    type: String,
+    required: true,
+  },
+})
 
 const emit = defineEmits(['statusClicked'])
 const Created = ref()
@@ -13,12 +32,22 @@ const Rejected = ref()
 const isLoading = ref(false)
 const data = ref()
 
+console.log('fromdate', props.fromDate)
 const fetchCount = async () => {
   try {
-    const ret = await axiosIns.get(`/tickets/count/status` )
+    const typeName = props.typeName
+    const depart = props.departName
+    const fromDate = props.fromDate
+    const toDate = props.toDate
+
+    const ret = await axiosIns.get(`/tickets/count/status`, {
+      params: { type: typeName, 
+                department_in_charge: depart, 
+                fromdate: fromDate ? new Date(fromDate).toISOString().split("T")[0] : null, 
+                todate: toDate ? new Date(toDate).toISOString().split("T")[0] : null },
+    } )
 
     data.value = ret.data.data
-
     // Created.value = ret.data.data.created
     // Submitted.value = ret.data.data.submitted
     // Started.value = ret.data.data.started
@@ -37,19 +66,32 @@ const fetchCount = async () => {
   }isLoading.value = false
 }
 
-
-onMounted(() => {
+watchEffect(() => {
   fetchCount()
 })
 
 const clickedStatus = ref(null)
 const isTotalTicketClicked = ref(false)
 
+// const handleStatusClick = status => {
+//   // Set semua status background ke false
+//   isTotalTicketClicked.value = false
+//   clickedStatus.value = status
+//   emit('statusClicked', status)
+// }
+
 const handleStatusClick = status => {
-  // Set semua status background ke false
-  isTotalTicketClicked.value = false
-  clickedStatus.value = status
-  emit('statusClicked', status)
+  if (clickedStatus.value === status) {
+    // Jika status sudah dipilih, klik lagi akan menghapusnya
+    clickedStatus.value = null
+    isTotalTicketClicked.value = false
+    emit('statusClicked', null)
+  } else {
+    // Jika status baru dipilih, atur status dan ubah background
+    clickedStatus.value = status
+    isTotalTicketClicked.value = false
+    emit('statusClicked', status)
+  }
 }
 
 // Fungsi untuk menangani klik pada total_ticket
@@ -77,7 +119,7 @@ const handleTotalTicketClick = () => {
               cols="2"
               class="text-left"
               :loading="isLoading"
-              :class="{ 'background': isTotalTicketClicked }"
+              :class="{ 'background': clickedStatus === status }"
               style="margin-right: -8px;"
             >
               <Vbtn

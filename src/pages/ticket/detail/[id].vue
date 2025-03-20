@@ -1,12 +1,13 @@
 <script setup>
 import { requiredValidator } from "@/@core/utils/validators"
-import { formatDateMySql, formatDateTimeMySql } from '@/@core/utils/formatters'
+import { formatDateMySql } from '@/@core/utils/formatters'
 import Person from '@/pages/ticket/person.vue'
 import axiosIns from '@/plugins/axios'
 import dayjs from 'dayjs'
 import Swal from 'sweetalert2'
 import { ref, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { formatDateTimeMySql, getCurrentDate } from '@/@core/utils/formatters'
 
 const router = useRouter()
 const route = useRoute()
@@ -58,8 +59,8 @@ const fetchTicket = async id => {
     ticketSubCategory.value = dataTicket.value.ticket_sub_categories.name
     attachment.value = dataTicket.value.attachment
     priority.value = dataTicket.value.priority
-    planStart.value = formatDateTimeMySql(dataTicket.value.plan_start)
-    endTarget.value = formatDateTimeMySql(dataTicket.value.target_end)
+    planStart.value = getCurrentDate(dataTicket.value.plan_start)
+    endTarget.value = getCurrentDate(dataTicket.value.target_end)
     person.value = dataTicket.value.person_in_charge.person.name ? dataTicket.value.person_in_charge.person.name : '-'
     description.value = dataTicket.value.description
     business_impact.value = dataTicket.value.business_impact
@@ -92,8 +93,8 @@ const update = async id => {
   showLoading.value = true
   try{
     let payload = {
-      plan_start: planStart.value||null,
-      target_end: endTarget.value||null,
+      plan_start: formatDateTimeMySql(planStart.value)||null,
+      target_end: formatDateTimeMySql(endTarget.value)||null,
     }
 
     if (personId.value){
@@ -112,7 +113,7 @@ const update = async id => {
 
 
     // fetchAssign()
-    router.push('/home')
+    router.back()
 
     // showLoading.value = false
   } catch(error){
@@ -141,7 +142,11 @@ const fetchAssign = async () =>{
 }
 
 const goBack = () =>{
-  router.push('/home')
+  router.back()
+}
+
+const openDatePicker = event => {
+  event.target.showPicker() 
 }
 </script>
 
@@ -265,21 +270,27 @@ const goBack = () =>{
               />
             </VCol>
             <VCol cols="3">
-              <VDateInput
+              <VTextField
                 v-model="planStart"
                 label="Plan Start"
-                density="compact"
-                :config="{enableTime: true, dateFormat: 'Y-m-d H:i', time_24hr: true}"
-                :disabled="status == 9"
+                  type="datetime-local"
+                  :rules="[requiredValidator]"
+                  density="comfortable"
+                  variant="outlined"
+                  class="custom-date-field"
+                  @click="openDatePicker"
               />
             </VCol>
             <VCol cols="3">
-              <VDateInput
+              <VTextField
                 v-model="endTarget"
-                label="Target End"
-                density="compact"
-                :config="{ enableTime: true, dateFormat: 'Y-m-d H:i', time_24hr: true}"
-                :disabled="status == 9"
+                label="Plan End"
+                  type="datetime-local"
+                  :rules="[requiredValidator]"
+                  density="comfortable"
+                  variant="outlined"
+                  class="custom-date-field"
+                  @click="openDatePicker"
               />
             </VCol>
             <VCol
@@ -372,6 +383,15 @@ const goBack = () =>{
     </VCol>
   </VRow>
 </template>
+
+<style>
+/* Menyembunyikan ikon kalender bawaan */
+.custom-date-field input::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+}
+</style>
+
 
 <route lang="yaml">
   meta:
