@@ -10,6 +10,7 @@ import { getCurrentDateTimeWIB, formatDateTimeMySql } from '@/@core/utils/format
 
 // import Person from '@/pages/ticket/person.vue'
 import Person from '@/pages/lookup/employee.vue'
+import Team from '@/pages/lookup/lookupTeamProject.vue'
 import Ticket from '@/pages/lookup/ticket.vue'
 
 const props = defineProps({
@@ -56,6 +57,11 @@ const personOldId = ref()
 const priorityOldId = ref()
 const typeOldId = ref()
 
+const teamDescription = ref()
+const teamOldId = ref()
+const teamId = ref()
+const teamName = ref()
+
 const ticketRequestor = ref()
 
 const projectDepartment = ref()
@@ -64,8 +70,19 @@ const departmentOldId = ref()
 
 const projectLineData = ref()
 
+const bisnisUnits = ref([])
+const biu = ref()
+const biuOldId = ref()
+
 const openDatePicker = event => {
   event.target.showPicker() 
+}
+
+const getTeam = val => {
+  teamName.value = val.name
+  teamDescription.value = val.description
+
+  teamId.value = val.id
 }
 
 const getApprovalPerson = val => {
@@ -131,11 +148,14 @@ const fetchProjectId = async headerId => {
     department.value = projectLineData.value.project_department?.description || ''
     departmentOldId.value = projectLineData.value.project_department_id
 
+    biu.value = projectLineData.value.biu?.name || ''
+    biuOldId.value = projectLineData.value.biu_id
+
     ticketNumber.value = projectLineData.value.ticket?.document_number
     ticketDescription.value = projectLineData.value.ticket?.description
 
-    person.value = projectLineData.value.assign_to?.person?.name
-    personOldId.value = projectLineData.value.assign_to?.id
+    teamName.value = projectLineData.value.team?.description || ''
+    teamOldId.value = projectLineData.value.team?.id
 
     priority.value = projectLineData.value.project_priority?.description
     priorityOldId.value = projectLineData.value.priority_id
@@ -171,11 +191,25 @@ const fetchDepartment = async () => {
   finally{showLoading.value = false}
 }
 
+const fetchBiu = async () => {
+  showLoading.value = true
+  try {
+    const ret = await axiosIns.get('organizations/getByBiu')
+
+    showLoading.value = false
+    bisnisUnits.value = ret.data.data
+  } catch (error) {
+    console.log(error)
+    toast.error('Failed Load Data')
+  }
+}
+
 watchEffect(() =>{
   fetchProjectId(props.headerId),
   fetchPriority(),
   fetchStatus(),
   fetchDepartment()
+  fetchBiu()
 })
 
 const editProject = async id => {
@@ -192,6 +226,8 @@ const editProject = async id => {
       actual_end      : ActualEnd.value,
       ticket_id       : ticketId.value || ticketIdOld.value,
       project_department_id       : department.value.id || departmentOldId.value,
+      project_team_id : teamId.value || teamOldId.value,
+      biu_id          : biu.value.id || biuOldId.value,
     } )
 
     projectId.value = ret.data.data.id
@@ -265,14 +301,14 @@ const validateFom = ()=>{
             @submit.prevent="validateFom"
           >
             <VRow>
-              <VCol cols="6">
+              <VCol cols="4">
                 <VTextField
                   v-model="name"
                   label="Name Project"
                   :rules="[requiredValidator]"
                 />
               </VCol>
-              <VCol cols="6">
+              <VCol cols="4">
                 <VAutocomplete
                   v-model="department"
                   return-object
@@ -280,6 +316,17 @@ const validateFom = ()=>{
                   item-title="description"
                   :items="projectDepartment"
                   label="To Department"
+                  :rules="[requiredValidator]"
+                />
+              </VCol>
+              <VCol cols="4">
+                <VAutocomplete
+                  v-model="biu"
+                  return-object
+                  item-value="id"
+                  item-title="name"
+                  :items="bisnisUnits"
+                  label="Bisnis Unit"
                   :rules="[requiredValidator]"
                 />
               </VCol>
@@ -344,15 +391,15 @@ const validateFom = ()=>{
                 class="d-flex gap-3"
               >
                 <VTextField
-                  v-model="person"
-                  label="Assign To"
+                  v-model="teamName"
+                  label="Assign For Team"
                   item-title="name"
                   item-value="id"
                   readonly
                   :rules="[requiredValidator]"
                 />
-                <Person
-                  @employee="getApprovalPerson"
+                <Team
+                  @team="getTeam"
                 />
               </VCol>
             </VRow>

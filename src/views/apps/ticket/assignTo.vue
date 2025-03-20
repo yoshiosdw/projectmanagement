@@ -392,6 +392,26 @@ const statusOptions = [
               <th>
                 Description
               </th>
+              <th scope="col">
+                Submited Date
+              </th>
+              <th scope="col">
+                Approved Date
+              </th>
+
+              <th scope="col">
+                Plan Start
+              </th>
+              <th scope="col">
+                Plan End
+              </th>
+
+              <th scope="col">
+                Actual Start
+              </th>
+              <th scope="col">
+                Actual End
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -601,6 +621,60 @@ const statusOptions = [
               <td>{{ data.extension_number }}</td>
               <td style="min-width: 250px; word-wrap: break-word;">
                 {{ data.description }}
+              </td>
+              <td style="min-width: 150px;">
+                {{ new Date(data.submitted_date).toISOString().split('T')[0].replace(/-/g, '/') }}
+              </td> 
+              <td style="min-width: 150px;">
+                {{ data.approved_date ? new Date(data.approved_date).toISOString().split('T')[0].replace(/-/g, '/') : '' }}
+              </td> 
+
+              <td style="min-width: 230px;">
+                {{ data.plan_start ? new Date(data.plan_start).toLocaleString('id-ID', { 
+                  timeZone: 'Asia/Jakarta', 
+                  year: 'numeric', 
+                  month: '2-digit', 
+                  day: '2-digit', 
+                  hour: '2-digit', 
+                  minute: '2-digit', 
+                  second: '2-digit' 
+                }).replace(',', '').replace(/\//g, '-') : '' }}
+              </td>
+
+              <td style="min-width: 230px;">
+                {{ data.target_end ? new Date(data.target_end).toLocaleString('id-ID', { 
+                  timeZone: 'Asia/Jakarta', 
+                  year: 'numeric', 
+                  month: '2-digit', 
+                  day: '2-digit', 
+                  hour: '2-digit', 
+                  minute: '2-digit', 
+                  second: '2-digit' 
+                }).replace(',', '').replace(/\//g, '-') : '' }}
+              </td>
+
+              <td style="min-width: 230px;">
+                {{ data.start_at ? new Date(data.start_at).toLocaleString('id-ID', { 
+                  timeZone: 'Asia/Jakarta', 
+                  year: 'numeric', 
+                  month: '2-digit', 
+                  day: '2-digit', 
+                  hour: '2-digit', 
+                  minute: '2-digit', 
+                  second: '2-digit' 
+                }).replace(',', '').replace(/\//g, '-') : '' }}
+              </td>
+
+              <td style="min-width: 230px;">
+                {{ data.end_at ? new Date(data.end_at).toLocaleString('id-ID', { 
+                  timeZone: 'Asia/Jakarta', 
+                  year: 'numeric', 
+                  month: '2-digit', 
+                  day: '2-digit', 
+                  hour: '2-digit', 
+                  minute: '2-digit', 
+                  second: '2-digit' 
+                }).replace(',', '').replace(/\//g, '-') : '' }}
               </td>
             </tr>
           </tbody>

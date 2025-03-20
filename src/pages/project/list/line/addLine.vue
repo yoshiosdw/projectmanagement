@@ -212,8 +212,8 @@ const validateFom = ()=>{
                 :rules="[requiredValidator]"
               />
               <Person
-                @employee="getApprovalPerson"
                 :project-team="projectTeam"
+                @employee="getApprovalPerson"
               />
             </VCol>
             <VCol cols="4">
@@ -254,25 +254,25 @@ const validateFom = ()=>{
             <VCol cols="3">
               <VTextField
                 v-model="planStartLine"
-                  label="Plan Start"
-                  type="datetime-local"
-                  :rules="[requiredValidator]"
-                  density="comfortable"
-                  variant="outlined"
-                  class="custom-date-field"
-                  @click="openDatePicker"
+                label="Plan Start"
+                type="datetime-local"
+                :rules="[requiredValidator]"
+                density="comfortable"
+                variant="outlined"
+                class="custom-date-field"
+                @click="openDatePicker"
               />
             </VCol>
             <VCol cols="3">
               <VTextField
                 v-model="planEndLine"
-                  label="Plan Start"
-                  type="datetime-local"
-                  :rules="[requiredValidator]"
-                  density="comfortable"
-                  variant="outlined"
-                  class="custom-date-field"
-                  @click="openDatePicker"
+                label="Plan End"
+                type="datetime-local"
+                :rules="[requiredValidator]"
+                density="comfortable"
+                variant="outlined"
+                class="custom-date-field"
+                @click="openDatePicker"
               />
             </VCol>
             <!--
