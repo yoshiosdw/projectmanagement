@@ -5,6 +5,13 @@ export const useJobOrder = defineStore("jobOrderStore", {
   state: () => ({
     orders: null,
     find: '',
-    pic: null
+    pic: null,
+    task: null,
+    page: 1,
+    perPage: 10,
+    total: 0,
+    last: 0,
+    from: 1,
+    to: 1
   }),
 });

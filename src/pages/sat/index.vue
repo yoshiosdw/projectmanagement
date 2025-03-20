@@ -5,10 +5,12 @@ import ability from '@/plugins/casl/ability'
 import Swal from 'sweetalert2'
 import { useRoute } from 'vue-router'
 import CaseDialog from './caseDialog.vue'
+import OutStanding from './dashboard/outstanding/outStanding.vue'
 import { useJobOrder } from './useJobOrderStore'
 
 const jobOrderStore = useJobOrder()
 const route = useRoute()
+const outstandings = computed(()=> route.query.outstanding)
 const sat = ref([])
 const allSat = ref()
 const totalSat = ref(0)
@@ -24,7 +26,7 @@ const satExc = ref()
 
 const loading = ref(true)
 
-const fetchJoborder = async (page, perPage, find, status, pic) => {
+const fetchJoborder = async (page, perPage, find, status, pic, task) => {
   loading.value = true
   try {
     const params = {
@@ -32,6 +34,7 @@ const fetchJoborder = async (page, perPage, find, status, pic) => {
       perPage: perPage,
       find: find,        
       pic: pic,
+      next_task: task,
     }
 
     if (status !== null) {
@@ -51,8 +54,10 @@ const fetchJoborder = async (page, perPage, find, status, pic) => {
 
     sat.value = response.data.data
     jobOrderStore.orders = response.data.data
-    totalSat.value = response.data.meta.total
-    last.value = response.data.meta.last
+    jobOrderStore.from = response.data.meta.from
+    jobOrderStore.to = response.data.meta.to
+    jobOrderStore.total = response.data.meta.total
+    jobOrderStore.last = response.data.meta.last
     loading.value = false
   } catch (error) {
     Swal.fire({
@@ -76,8 +81,8 @@ const fetchAllJobOrder = async() => {
 }
 
 watchEffect(() => {
-  fetchAllJobOrder(),
-  fetchJoborder(page.value, perPage.value, find.value, selectedStatus.value, jobOrderStore.pic)
+  // fetchAllJobOrder(),
+  fetchJoborder(jobOrderStore.page, jobOrderStore.perPage, find.value, selectedStatus.value, jobOrderStore.pic, jobOrderStore.task)
 
   // fetchJoborder(page.value, perPage.value, find.value, selectedStatus.value, selectedPic.value)
 })
@@ -91,6 +96,7 @@ const findSat = async () => {
 
   // jobOrderStore.pic = selectedPic.value
   jobOrderStore.pic = route.query.pic
+  jobOrderStore.task = route.query.task
 }
 
 const statusOptions = [
@@ -114,7 +120,7 @@ const deleteData = async id => {
   try {
     const ret = await axiosIns.delete(`/job/orders/${id}` )
 
-    fetchJoborder(page.value, perPage.value, find.value, selectedStatus.value, jobOrderStore.pic)
+    fetchJoborder(jobOrderStore.page, jobOrderStore.perPage, find.value, selectedStatus.value, jobOrderStore.pic, jobOrderStore.task)
   } catch (error) {
     Swal.fire({
       title: 'LBG',
@@ -147,7 +153,7 @@ const revisedData = async id => {
   try {
     const ret = await axiosIns.patch(`/job/orders/revised/${id}`, {} )
 
-    fetchJoborder(page.value, perPage.value, find.value, selectedStatus.value, jobOrderStore.pic)
+    fetchJoborder(jobOrderStore.page, jobOrderStore.perPage, find.value, selectedStatus.value, jobOrderStore.pic, jobOrderStore.task)
     loading.value = false
   } catch(error) {
     Swal.fire({
@@ -179,7 +185,7 @@ const cancelData = async id => {
   try {
     const ret = await axiosIns.patch(`/job/orders/cancel/${id}`, null )
 
-    fetchJoborder(page.value, perPage.value, find.value, selectedStatus.value, jobOrderStore.pic)
+    fetchJoborder(jobOrderStore.page, jobOrderStore.perPage, find.value, selectedStatus.value, jobOrderStore.pic, jobOrderStore.task)
   } catch(error) {
     Swal.fire({
       title: 'LBG',
@@ -245,7 +251,7 @@ const resolveStatusVariant = status => {
 }
 
 const reloadSatData = () => {
-  fetchJoborder(page.value, perPage.value, find.value, selectedStatus.value, jobOrderStore.pic)
+  fetchJoborder(jobOrderStore.page, jobOrderStore.perPage, find.value, selectedStatus.value, jobOrderStore.pic, jobOrderStore.task)
 }
 
 const handleCaseUpdated = isUpdated => {
@@ -287,12 +293,17 @@ const resolveAttachVariant = attachment => {
     }
 }
 
-const paginationData = computed(() => {
-  const firstIndex = totalSat.value == 0 ? 0 : (page.value - 1) * perPage.value + 1
-  const lastIndex = page.value * perPage.value >= totalSat.value ? totalSat.value : page.value * perPage.value
+// const paginationData = computed(() => {
+//   const firstIndex = totalSat.value == 0 ? 0 : (page.value - 1) * perPage.value + 1
+//   const lastIndex = page.value * perPage.value >= totalSat.value ? totalSat.value : page.value * perPage.value
   
-  return `Showing ${firstIndex} to ${lastIndex} of ${totalSat.value} entries`
-})
+//   return `Showing ${firstIndex} to ${lastIndex} of ${totalSat.value} entries`
+// })
+
+const paginationData = computed(() => {
+  console.log('page', jobOrderStore.to)
+  return `Showing ${jobOrderStore.from} to ${jobOrderStore.to} of ${jobOrderStore.total}`;
+});
 
 const exportClickHandler = async () => {
   loading.value = true
@@ -328,10 +339,54 @@ const exportClickHandler = async () => {
     loading.value = false
   }
 }
+
+const revokedData = async id => {
+  try {
+    const ret = await axiosIns.patch(`job/orders/revoked/data/${id}`)
+
+    fetchJoborder(jobOrderStore.page, jobOrderStore.perPage, find.value, selectedStatus.value, jobOrderStore.pic, jobOrderStore.task)
+  } catch (error) {
+    Swal.fire({
+      title: 'LBG',
+      text: 'Revoke data failed',
+      icon: 'error',
+    })
+    console.log(error)
+  }
+}
+
+const btnRevokeClickHandler = id => {
+  Swal.fire({
+    title: 'LBG',
+    text: 'Sure revoke data?',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonColor: 'warning',
+    cancelButtonColor: 'primary',
+    confirmButtonText: 'Yes, revoked!',
+  }).then(ret => {
+    if (ret.isConfirmed) {
+      revokedData(id)      
+    }
+  })
+}
+
+const hasRevoked = tasks => {
+  return tasks.some(task => task.task_sequence >= 4 && task.status === 1)
+}
+
+const handleOutStanding = val => {
+  const task = val
+
+  jobOrderStore.task= task
+}
 </script>
 
 <template>
   <VRow>
+    <VCol cols="12">
+      <OutStanding @outstanding="handleOutStanding"/>
+    </VCol>
     <VCol cols="12">
       <VOverlay v-model="loading" />
       <VCard :loading="loading">
@@ -339,7 +394,7 @@ const exportClickHandler = async () => {
           <!-- {{ selectedPic }} -->
           <div style="min-width: 80px;">
             <VSelect 
-              v-model="perPage"
+              v-model="jobOrderStore.perPage"
               :items="[10, 20, 30, 50]"
             />
           </div>
@@ -548,6 +603,21 @@ const exportClickHandler = async () => {
                             Cancel
                           </template>
                         </VListItem>
+                        <VListItem
+                          v-if="data.status_name === 'On Progress' && ability.can('Revoked', 'PPIC SAT Task') && hasRevoked(data.sat_job_order_task)"
+                          value="user"
+                          @click="btnRevokeClickHandler(data.id)"
+                        >
+                          <template #prepend>
+                            <VIcon
+                              color="error" 
+                              icon="tabler-copy-x"
+                              size="24"
+                              class="me-3"
+                            />
+                            Revoked
+                          </template>
+                        </VListItem>
                         <!-- <VDivider /> -->
                         <VListItem
                           v-if="data.status_name === 'Open' && ability.can('Manage', 'SAT')"
@@ -707,10 +777,10 @@ const exportClickHandler = async () => {
           </span>
 
           <VPagination
-            v-model="page"
+            v-model="jobOrderStore.page"
             size="small"
             :total-visible="5"
-            :length="last"
+            :length="jobOrderStore.last"
           />
         </VCardText>
       </VCard>

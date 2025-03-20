@@ -91,8 +91,8 @@ const cancelClickHandler = () => {
               <VTextField :readonly="true">{{ props.data.task_name }}</VTextField>
               <div class="mt-4">
                 <p style="margin-bottom: -10px;margin-left: 7px;">Shipdate Confirmation</p>
-                <!-- <VDateInput /> -->
-                <VDateInput
+                <!-- <AppDateTimePicker /> -->
+                <AppDateTimePicker
                   :model-value="new Date().toJSON().slice(0, 10)"
                   :config="{ inline: true }"
                   class="calendar-date-picker"

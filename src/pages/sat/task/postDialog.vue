@@ -1,17 +1,16 @@
 <script setup>
+import AppDateTimePicker from "@/@core/components/AppDateTimePicker.vue"
 import { requiredValidator } from "@/@core/utils/validators"
 import axiosIns from "@/plugins/axios"
 import { dateNow, formatDateMySql } from '@core/utils/formatters'
 import Swal from "sweetalert2"
-import { VDateInput } from 'vuetify/lib/labs/components.mjs'
 
 const props = defineProps({
   data: ({
-    type: Object,
-  }),
+    type: Object
+  })
 })
 
-const emits = defineEmits(['status'])
 const taskForm = ref()
 const note = ref('')
 const attachment = ref()
@@ -20,6 +19,7 @@ const confirmationDate = ref(new Date())
 const attachFile = ref()
 const isVisible = ref(false)
 
+const emits = defineEmits(['status'])
 const sendStatus = val => {
   emits('status', val)
 }
@@ -27,30 +27,30 @@ const sendStatus = val => {
 const updateTask = async() => {
   try {
     // const allowedMimeTypes = ['image/jpg', 'application/pdf', 'application/vnd.ms-excel']
-    const formData = new FormData()
+    const formData = new FormData();
     if (attachFile.value) {
-      formData.append('attachment', attachFile.value)
+      formData.append('attachment', attachFile.value);
     }
     
-    formData.append('request_ship_date', dateNow())
-    formData.append('confirmation_date', formatDateMySql(confirmationDate.value))
-    formData.append('note', note.value)
-    formData.append('so_number', soNumber.value)
+    formData.append('request_ship_date', dateNow());
+    formData.append('confirmation_date', formatDateMySql(confirmationDate.value));
+    formData.append('note', note.value);
+    formData.append('so_number', soNumber.value);
 
     const ret = await axiosIns.post(`/job/order/takses/post/${props.data.id}`, formData, {
       headers: {
         'Authorization': 'Bearer ' + localStorage.getItem('sinarjoAccessToken'),
         'Content-Type': 'multipart/form-data',
-      },
-    })
+      }
+    });
 
-    emits('task-uploaded', true)
-    sendStatus(true)
+    emits('task-uploaded', true);
+    sendStatus(true);
   } catch(error) {
     Swal.fire({
       title: 'LBG',
       text: error.response.data.message,
-      icon: 'error',
+      icon: 'error'
     })
     sendStatus(false)
     console.log(error)
@@ -76,11 +76,7 @@ const cancelClickHandler = () => {
 </script>
 
 <template>
-  <VDialog
-    v-model="isVisible"
-    :width="900"
-    persistent
-  >
+  <VDialog v-model="isVisible" :width="900" persistent>
     <template #activator="{props}">
       <VListItemTitle v-bind="props">
         <VIcon 
@@ -94,85 +90,57 @@ const cancelClickHandler = () => {
     </template>
     <VCard>
       <VCardText>
-        <VForm
-          ref="taskForm"
-          style="height: auto;"
-          @submit.prevent="onSubmit"
-        >
+        <VForm ref="taskForm" @submit.prevent="onSubmit" style="height: auto;">
           <VRow>
             <VCol cols="6">
-              <VTextField :readonly="true">
-                {{ props.data.task_name }}
-              </VTextField>
+              <VTextField :readonly="true">{{ props.data.task_name }}</VTextField>
               <div class="mt-4">
-                <p style="margin-bottom: -10px;margin-left: 7px;">
-                  Shipdate Confirmation
-                </p>
-                <!-- <VDateInput /> -->
-                <VDateInput
-                  v-model="confirmationDate"
+                <p style="margin-bottom: -10px;margin-left: 7px;">Shipdate Confirmation</p>
+                <!-- <AppDateTimePicker /> -->
+                <AppDateTimePicker
                   :model-value="new Date().toJSON().slice(0, 10)"
                   :config="{ inline: true }"
                   class="calendar-date-picker"
+                  v-model="confirmationDate"
                   :rules="[requiredValidator]"
                 />
               </div>
             </VCol>
             <VCol cols="6">
-              <VTextField
-                v-model="soNumber"
-                label="SO Number"
-              />
+              <VTextField label="SO Number" v-model="soNumber" />
               <VTextarea 
-                v-model="note" 
-                label="Note"
+                label="Note" 
+                v-model="note"
                 rows="2"
                 class="mt-4"
               />
               <div class="mt-4">
-                <VFileInput
-                  v-model="attachment"
-                  label="Attach file"
-                  accept=".pdf"
-                  @change="handleFileChange"
-                />
+                <VFileInput label="Attach file" v-model="attachment" @change="handleFileChange" accept=".pdf"/>
               </div>
             </VCol>
           </VRow>
-          <!--
-            <VRow style="margin-top: -15px;">
+          <!-- <VRow style="margin-top: -15px;">
             <VCol cols="6">
-            <p style="margin-bottom: -10px;margin-top: -10px;margin-left: 7px;">Shipdate Confirmation</p>
-            <VDateInput
-            :model-value="new Date().toJSON().slice(0, 10)"
-            :config="{ inline: true }"
-            class="calendar-date-picker"
-            v-model="confirmationDate"
-            :rules="[requiredValidator]"
-            />
+              <p style="margin-bottom: -10px;margin-top: -10px;margin-left: 7px;">Shipdate Confirmation</p>
+              <AppDateTimePicker
+                :model-value="new Date().toJSON().slice(0, 10)"
+                :config="{ inline: true }"
+                class="calendar-date-picker"
+                v-model="confirmationDate"
+                :rules="[requiredValidator]"
+              />
             </VCol>
             <VCol cols="6">
-            <div class="mt-4">
-            <VFileInput label="Attach file" v-model="attachment" @change="handleFileChange" accept=".pdf"/>
-            </div>
+              <div class="mt-4">
+                <VFileInput label="Attach file" v-model="attachment" @change="handleFileChange" accept=".pdf"/>
+              </div>
             </VCol>
-            </VRow> 
-          -->
+          </VRow> -->
           <VRow>
             <VCol cols="12">
               <div class="d-flex mt-6 gap-4 justify-end">
-                <VBtn
-                  color="warning"
-                  @click="cancelClickHandler"
-                >
-                  Cancel
-                </VBtn>
-                <VBtn
-                  color="primary"
-                  type="submit"
-                >
-                  Save
-                </VBtn>
+                <VBtn color="warning" @click="cancelClickHandler">Cancel</VBtn>
+                <VBtn color="primary" type="submit" >Save</VBtn>
               </div>
             </VCol>
           </VRow>

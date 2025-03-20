@@ -338,7 +338,7 @@ const resolveAttachVariant = attachment => {
               </VCol>
               <!--
                 <VCol cols="3">
-                <VDateInput 
+                <AppDateTimePicker 
                 :rules="[requiredValidator]"
                 v-model="documentDate"
                 label="Document Date"
@@ -354,7 +354,7 @@ const resolveAttachVariant = attachment => {
                 />
               </VCol>
               <VCol cols="4">
-                <VDateInput 
+                <AppDateTimePicker 
                   v-model="billDate"
                   :rules="[requiredValidator]"
                   label="Bill Date"
@@ -426,12 +426,12 @@ const resolveAttachVariant = attachment => {
               </VCol>
               <VCol cols="3">
                 <!--
-                  <VDateInput 
+                  <AppDateTimePicker 
                   v-model="receivedDate"
                   label="Received Date"
                   /> 
                 -->
-                <VDateInput
+                <AppDateTimePicker
                   v-model="receivedDate"
                   label="Received Date"
                   :rules="[requiredValidator]"
@@ -439,7 +439,7 @@ const resolveAttachVariant = attachment => {
                 />
               </VCol>
               <VCol cols="3">
-                <VDateInput 
+                <AppDateTimePicker 
                   v-model="shipDate"
                   label="Request Ship Date"
                 />
