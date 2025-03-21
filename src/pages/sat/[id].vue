@@ -1,5 +1,5 @@
 <script setup>
-import { formatDateMySql, formatDateTimeMySql } from '@/@core/utils/formatters'
+import { formatDateMySql, formatDateTimeMySql, getCurrentDate } from '@/@core/utils/formatters'
 import { requiredValidator } from '@/@core/utils/validators'
 import Customer from '@/pages/lookup/satCustomers.vue'
 import axiosIns from '@/plugins/axios'
@@ -10,6 +10,7 @@ import PostDialog from './task/postDialog.vue'
 import RejectDialog from './task/rejectDialog.vue'
 import RevisedDialog from './task/revisedDialog.vue'
 import { useJobOrder } from './useJobOrderStore'
+import { VDateInput } from 'vuetify/lib/labs/components.mjs'
 
 const route = useRoute()
 const satId = ref(route.params.id)
@@ -114,7 +115,7 @@ const fetchJobOrder = async satId => {
 
     // attachment.value = ret.data.data[0].attachment
     quantity.value = ret.data.data[0].qty 
-    receivedDate.value = ret.data.data[0].received_date 
+    receivedDate.value = getCurrentDate(ret.data.data[0].received_date) 
     shipDate.value = ret.data.data[0].request_ship_date 
     selectedStatus.value = ret.data.data[0].status_order
     
@@ -313,6 +314,10 @@ const resolveAttachVariant = attachment => {
       color: 'success',
     }
 }
+
+const openDatePicker = event => {
+  event.target.showPicker() 
+}
 </script>
 
 <template>
@@ -354,10 +359,13 @@ const resolveAttachVariant = attachment => {
                 />
               </VCol>
               <VCol cols="4">
-                <AppDateTimePicker 
+                <VDateInput 
                   v-model="billDate"
                   :rules="[requiredValidator]"
                   label="Bill Date"
+                  variant="outlined"
+                  prepend-icon=""
+                  density="compact"
                 />
               </VCol>
             </VRow>
@@ -431,17 +439,23 @@ const resolveAttachVariant = attachment => {
                   label="Received Date"
                   /> 
                 -->
-                <AppDateTimePicker
+                <VTextField
                   v-model="receivedDate"
                   label="Received Date"
-                  :rules="[requiredValidator]"
-                  :config="{ enableTime: true, dateFormat: 'Y-m-d H:i' }"
-                />
+                  type="datetime-local"
+                  density="compact"
+                  variant="outlined"
+                  class="custom-date-field"
+                  @click="openDatePicker"
+                />  
               </VCol>
               <VCol cols="3">
-                <AppDateTimePicker 
+                <VDateInput 
                   v-model="shipDate"
                   label="Request Ship Date"
+                  prepend-icon=""
+                  variant="outlined"
+                  density="compact"
                 />
               </VCol>
               <VCol cols="3">
@@ -657,6 +671,14 @@ const resolveAttachVariant = attachment => {
     </VCol>
   </VRow>
 </template>
+
+<style>
+/* Menyembunyikan ikon kalender bawaan */
+.custom-date-field input::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+}
+</style>
 
 <route lang="yaml">
   meta:

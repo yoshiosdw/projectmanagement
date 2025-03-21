@@ -1,5 +1,5 @@
 <script setup>
-import { formatDateMySql, formatDateTimeMySql } from '@/@core/utils/formatters'
+import { formatDate, formatDateMySql, formatDateTimeMySql } from '@/@core/utils/formatters'
 import { requiredValidator } from '@/@core/utils/validators'
 import ability from '@/plugins/casl/ability'
 
@@ -12,6 +12,7 @@ import Swal from 'sweetalert2'
 import { useRouter } from 'vue-router'
 import PostDialog from './task/postDialog.vue'
 import ProcessDialog from './task/processDialog.vue'
+import { VDateInput } from 'vuetify/lib/labs/components.mjs'
 
 const satId = ref()
 const tasks = ref()
@@ -218,6 +219,10 @@ const resolveAttachVariant = attachment => {
       color: 'success',
     }
 }
+
+const openDatePicker = event => {
+  event.target.showPicker() 
+}
 </script>
 
 <template>
@@ -259,10 +264,13 @@ const resolveAttachVariant = attachment => {
                 />
               </VCol>
               <VCol cols="4">
-                <AppDateTimePicker 
+                <VDateInput 
                   v-model="billDate"
                   :rules="[requiredValidator]"
                   label="Bill Date"
+                  variant="outlined"
+                  density="compact"
+                  prepend-icon=""
                 />
               </VCol>
             </VRow>
@@ -333,17 +341,23 @@ const resolveAttachVariant = attachment => {
                 />
               </VCol>
               <VCol cols="3">
-                <AppDateTimePicker 
+                <VTextField 
                   v-model="receivedDate"
                   label="Received Date"
-                  :rules="[requiredValidator]"
-                  :config="{ enableTime: true, dateFormat: 'Y-m-d H:i' }"
+                  type="datetime-local"
+                  density="compact"
+                  variant="outlined"
+                  class="custom-date-field"
+                  @click="openDatePicker"
                 />
               </VCol>
               <VCol cols="3">
-                <AppDateTimePicker 
+                <VDateInput 
                   v-model="shipDate"
                   label="Request Ship Date"
+                  density="compact"
+                  variant="outlined"
+                  prepend-icon=""
                 />
               </VCol>
               <VCol cols="3">
@@ -558,6 +572,14 @@ const resolveAttachVariant = attachment => {
     </VCol>
   </VRow>
 </template>
+
+<style>
+/* Menyembunyikan ikon kalender bawaan */
+.custom-date-field input::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+}
+</style>
 
 <route lang="yaml">
   meta:
