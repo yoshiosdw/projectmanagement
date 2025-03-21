@@ -535,8 +535,9 @@ const handleOutStanding = val => {
                               class="me-3"
                               icon="tabler:browser-check"
                             />
+                            Task
                           </template>
-                          <VListItemTitle>Task</VListItemTitle>
+                          <!-- <VListItemTitle>Task</VListItemTitle> -->
                         </VListItem>
                         <VListItem
                           v-if="data.status_name === 'Revised'"
@@ -631,8 +632,9 @@ const handleOutStanding = val => {
                               size="24"
                               icon="tabler-trash"
                             />
+                            Delete
                           </template>
-                          <VListItemTitle>Delete</VListItemTitle>
+                          <!-- <VListItemTitle>Delete</VListItemTitle> -->
                         </VListItem>
                       </VList>
                     </VMenu>
