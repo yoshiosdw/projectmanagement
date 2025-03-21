@@ -97,10 +97,6 @@ const cancelClickHandler = () => {
               <VTextField :readonly="true">{{ props.data.task_name }}</VTextField>
               </VCol>
               <VCol>
-                <!-- 
-                  <p style="margin-bottom: -10px;margin-left: 7px;">Shipdate Confirmation</p>
-                  -->
-                <!-- <AppDateTimePicker /> -->
                 <VDateInput
                   :model-value="new Date().toJSON().slice(0, 10)"
                   v-model="confirmationDate"
@@ -115,7 +111,7 @@ const cancelClickHandler = () => {
           </VRow>
           <VRow>
             <VCol cols="12">
-              <div class="d-flex mt-6 gap-4 justify-end">
+              <div class="d-flex gap-4 justify-end">
                 <VBtn color="warning" @click="cancelClickHandler">Cancel</VBtn>
                 <VBtn color="primary" type="submit" >Save</VBtn>
               </div>

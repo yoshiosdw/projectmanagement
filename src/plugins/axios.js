@@ -27,5 +27,28 @@ axiosIns.interceptors.request.use(config => {
   return Promise.reject(error)
 })
 
+axiosIns.interceptors.response.use(
+  response => {
+    return response
+  },
+  error => {
+    if (error.response && error.response.status === 401) {
+      console.log('Token expired, redirecting to login...')
+      
+      localStorage.setItem('sinarjoUserData', '{}')
+      localStorage.removeItem('sinarjoAccessToken')
+      localStorage.removeItem('sinarjoUserAbilities')
+      
+      
+      router.push('/login')
+      toast.info('Token Expired Please Login Again.')
+      
+      return
+    }
+
+    return Promise.reject(error)
+  },
+)
+
 
 export default axiosIns
