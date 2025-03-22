@@ -229,7 +229,7 @@ const openDatePicker = event => {
   <VRow>
     <VCol cols="12">
       <VOverlay v-model="isLoading" />
-      <VCard>
+      <VCard :loading="isLoading">
         <VCardTitle>Create SAT</VCardTitle>
         <VCardText>
           <VForm
