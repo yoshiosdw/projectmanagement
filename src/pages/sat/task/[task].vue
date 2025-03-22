@@ -12,6 +12,7 @@ import RejectDialog from './rejectDialog.vue'
 import RevisedDialog from './revisedDialog.vue'
 import PostDialogCopyDelivery from './postDialogDelivery.vue'
 import { VDateInput } from 'vuetify/lib/labs/components.mjs'
+import { load } from 'webfontloader'
 
 const route = useRoute()
 const satId = ref(route.params.task)
@@ -210,7 +211,7 @@ const resolveAttachVariant = attachment => {
   <VRow>
     <VCol cols="12">
       <VOverlay v-model="isLoading" />
-      <VCard>
+      <VCard :loading="isLoading">
         <VCardTitle>View SAT</VCardTitle>
         <VCardText>
           <VForm ref="refSatForm">
@@ -542,7 +543,13 @@ const resolveAttachVariant = attachment => {
                             @task-uploaded="handlePostUpdated"
                           />
                         </VListItem>
-                        <VListItem v-if="(data.status === 1) && data.task_sequence === 4 && ability.can('Revised', 'BOA SAT Task')">
+                        <!-- <VListItem v-if="(data.status === 1) && data.task_sequence === 4 && ability.can('Revised', 'BOA SAT Task')">
+                          <RevisedDialog
+                            :data="data"
+                            @task-uploaded="handlePostUpdated"
+                          />
+                        </VListItem> -->
+                        <VListItem v-if="(data.status === 1) && data.task_sequence === 4 && (data.transaction_date !== null) && ability.can('Revised', 'BOA SAT Task')">
                           <RevisedDialog
                             :data="data"
                             @task-uploaded="handlePostUpdated"

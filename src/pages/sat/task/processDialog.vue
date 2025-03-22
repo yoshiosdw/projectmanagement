@@ -16,12 +16,14 @@ const note = ref('')
 const attachment = ref()
 const attachFile = ref()
 const isVisible = ref(false)
+const loading = ref(true)
 
 const sendStatus = val => {
   emits('status', val)
 }
 
 const updateTask = async() => {
+  loading.value = true
   try {
     // const allowedMimeTypes = ['image/jpg', 'application/pdf', 'application/vnd.ms-excel']
     const formData = new FormData()
@@ -44,6 +46,7 @@ const updateTask = async() => {
 
     emits('task-uploaded', true)
     sendStatus(true)
+    loading.value = false
   } catch(error) {
     Swal.fire({
       title: 'LBG',
