@@ -1,6 +1,7 @@
 <script setup>
 import axiosIns from '@/plugins/axios'
 import Swal from 'sweetalert2'
+import { useJobOrder } from '../../useJobOrderStore'
 
 const emit = defineEmits(['outstanding'])
 
@@ -29,8 +30,8 @@ onMounted(() => {
 })
 
 const redirectToSat = val => {
-  clickedTask.value = clickedTask.value === val ? null : val;
-  emit("outstanding", clickedTask.value);
+  useJobOrder.clickedTask = useJobOrder.clickedTask === val ? null : val;
+  emit("outstanding", useJobOrder.clickedTask);
 }
 </script>
 
@@ -48,7 +49,7 @@ const redirectToSat = val => {
             v-if="allTask"
             cols="2"
             class="text-center"
-            :class="{ 'background-clicked': clickedTask == 1 }"
+            :class="{ 'background-clicked': useJobOrder.clickedTask == 1 }"
             :loading="isLoading"
             @click="redirectToSat(1)"
             style="cursor: pointer;"
@@ -75,7 +76,7 @@ const redirectToSat = val => {
               v-if="allTask"
               cols="2"
               class="text-left"
-              :class="{ 'background-clicked': clickedTask == 2 }"
+              :class="{ 'background-clicked': useJobOrder.clickedTask == 2 }"
               :loading="isLoading"
               @click="redirectToSat(2)"
               style="cursor: pointer;"
@@ -102,7 +103,7 @@ const redirectToSat = val => {
               v-if="allTask"
               cols="2"
               class="text-left"
-              :class="{ 'background-clicked': clickedTask == 3 }"
+              :class="{ 'background-clicked': useJobOrder.clickedTask == 3 }"
               :loading="isLoading"
               @click="redirectToSat(3)"
               style="cursor: pointer;"
@@ -128,7 +129,7 @@ const redirectToSat = val => {
               v-if="allTask"
               cols="2"
               class="text-left"
-              :class="{ 'background-clicked': clickedTask == 4 }"
+              :class="{ 'background-clicked': useJobOrder.clickedTask == 4 }"
               :loading="isLoading"
               @click="redirectToSat(4)"
               style="cursor: pointer;"
@@ -154,7 +155,7 @@ const redirectToSat = val => {
               v-if="allTask"
               cols="2"
               class="text-left"
-              :class="{ 'background-clicked': clickedTask == 5 }"
+              :class="{ 'background-clicked': useJobOrder.clickedTask == 5 }"
               :loading="isLoading"
               @click="redirectToSat(5)"
               style="cursor: pointer;"
@@ -183,7 +184,7 @@ const redirectToSat = val => {
               v-if="allTask"
               cols="2"
               class="text-left"
-              :class="{ 'background-clicked': clickedTask == 6 }"
+              :class="{ 'background-clicked': useJobOrder.clickedTask == 6 }"
               :loading="isLoading"
               @click="redirectToSat(6)"
               style="cursor: pointer;"

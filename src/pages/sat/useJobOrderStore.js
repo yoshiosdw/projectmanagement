@@ -12,6 +12,7 @@ export const useJobOrder = defineStore("jobOrderStore", {
     total: 0,
     last: 0,
     from: 1,
-    to: 1
+    to: 1,
+    clickedTask: null
   }),
 });
