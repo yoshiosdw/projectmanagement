@@ -379,6 +379,7 @@ const validateFom = ()=>{
               <VCol cols="3">
                 <VAutocomplete
                   v-model="priority"
+                  return-object
                   item-value="code"
                   item-title="description"
                   :items="Projectpriority"
