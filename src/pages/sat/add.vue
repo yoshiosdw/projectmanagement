@@ -431,6 +431,9 @@ const openDatePicker = event => {
                 Request Date
               </th>
               <th scope="col">
+                Processed By
+              </th>
+              <th scope="col">
                 Note
               </th>
               <th scope="col">
@@ -474,6 +477,11 @@ const openDatePicker = event => {
               <td>
                 <div class="d-flex flex-column">
                   <p>{{ formatDateTimeMySql(data.request_ship_date) }}</p>
+                </div>
+              </td>
+              <td>
+                <div class="d-flex flex-column">
+                  <p>{{ data.user?.person?.name || '' }}</p>
                 </div>
               </td>
               <td>
