@@ -13,7 +13,7 @@ const props = defineProps({
   },
 })
 
-const emits = defineEmits(['satNotif', 'close'])
+const emits = defineEmits(['satNotif', 'close', 'routeClose'])
 const isVisible = ref(false)
 const satNotif = ref([])
 const total = ref(0)
@@ -85,6 +85,7 @@ const closeDialog = () => {
 const navigateToTask = () => {
   router.push({ name: 'sat-task-task', params: { task: satTaskId.value } })
   isVisible.value = false
+  emits('routeClose', true)
 }
 </script>
 

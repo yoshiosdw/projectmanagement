@@ -243,6 +243,7 @@ watch(() => notificationsStore.notifTrigger, () => {
       v-if="isNotif"
       :sat-id="satId"
       @close="getClosed"
+      @route-close="getClosed"
     />
   </VBtn>
 </template>
