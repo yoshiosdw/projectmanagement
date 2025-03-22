@@ -13,6 +13,7 @@ const note = ref('')
 const attachment = ref()
 const attachFile = ref()
 const isVisible = ref(false)
+const loading = ref(true)
 
 const emits = defineEmits(['status'])
 const sendStatus = val => {
@@ -20,6 +21,7 @@ const sendStatus = val => {
 }
 
 const updateTask = async() => {
+  loading.value = true
   try {
     const formData = new FormData()
     formData.append('note', note.value)
@@ -31,6 +33,7 @@ const updateTask = async() => {
     })
     emits('task-uploaded', true)
     sendStatus(true)
+    loading.value = false
   } catch(error) {
     Swal.fire({
       title: 'LBG',

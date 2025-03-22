@@ -107,8 +107,8 @@ const getChartOptions = computed(() => ({
 <template>
   <VCard
     class="text-center"
-    title="Job Order"
-    subtitle="Sum QTY"
+    title="Sum QTY"
+    subtitle="Job Order"
   >
     <div>
       <VueApexCharts

@@ -1,5 +1,5 @@
 <script setup>
-import { formatDateMySql, formatDateTimeMySql } from '@/@core/utils/formatters'
+import { formatDate, formatDateMySql, formatDateTimeMySql } from '@/@core/utils/formatters'
 import { requiredValidator } from '@/@core/utils/validators'
 import axiosIns from '@/plugins/axios'
 import ability from '@/plugins/casl/ability'
@@ -11,6 +11,8 @@ import ProcessDialog from './processDialog.vue'
 import RejectDialog from './rejectDialog.vue'
 import RevisedDialog from './revisedDialog.vue'
 import PostDialogCopyDelivery from './postDialogDelivery.vue'
+import { VDateInput } from 'vuetify/lib/labs/components.mjs'
+import { load } from 'webfontloader'
 
 const route = useRoute()
 const satId = ref(route.params.task)
@@ -93,7 +95,7 @@ const fetchJobOrder = async satId => {
     territory.value = ret.data.data[0].sales_territory
     attachment.value = ret.data.data[0].attachment
     quantity.value = ret.data.data[0].qty 
-    receivedDate.value = formatDateMySql(ret.data.data[0].received_date )
+    receivedDate.value = ret.data.data[0].received_date 
     shipDate.value = formatDateMySql(ret.data.data[0].request_ship_date )
     statusOrder.value = ret.data.data[0].status_order_name
   } catch(error) {
@@ -209,7 +211,7 @@ const resolveAttachVariant = attachment => {
   <VRow>
     <VCol cols="12">
       <VOverlay v-model="isLoading" />
-      <VCard>
+      <VCard :loading="isLoading">
         <VCardTitle>View SAT</VCardTitle>
         <VCardText>
           <VForm ref="refSatForm">
@@ -242,10 +244,13 @@ const resolveAttachVariant = attachment => {
                 />
               </VCol>
               <VCol cols="4">
-                <VTextField 
+                <VDateInput 
                   v-model="billDate"
                   label="Bill Date"
                   :readonly="true"
+                  variant="outlined"
+                  prepend-icon=""
+                  density="compact"
                 />
               </VCol>
             </VRow>
@@ -320,13 +325,20 @@ const resolveAttachVariant = attachment => {
                   v-model="receivedDate"
                   label="Received Date"
                   :readonly="true"
+                  variant="outlined"
+                  density="compact"
+                  type="datetime-local"
+                  class="custom-date-field"
                 />
               </VCol>
               <VCol cols="3">
-                <VTextField 
+                <VDateInput 
                   v-model="shipDate"
                   label="Request Ship Date"
                   :readonly="true"
+                  density="compact"
+                  variant="outlined"
+                  prepend-icon=""
                 />
               </VCol>
               <VCol cols="3">
@@ -531,7 +543,13 @@ const resolveAttachVariant = attachment => {
                             @task-uploaded="handlePostUpdated"
                           />
                         </VListItem>
-                        <VListItem v-if="(data.status === 1) && data.task_sequence === 4 && ability.can('Revised', 'BOA SAT Task')">
+                        <!-- <VListItem v-if="(data.status === 1) && data.task_sequence === 4 && ability.can('Revised', 'BOA SAT Task')">
+                          <RevisedDialog
+                            :data="data"
+                            @task-uploaded="handlePostUpdated"
+                          />
+                        </VListItem> -->
+                        <VListItem v-if="(data.status === 1) && data.task_sequence === 4 && (data.transaction_date !== null) && ability.can('Revised', 'BOA SAT Task')">
                           <RevisedDialog
                             :data="data"
                             @task-uploaded="handlePostUpdated"
@@ -564,6 +582,14 @@ const resolveAttachVariant = attachment => {
     </VCol>
   </VRow>
 </template>
+
+<style>
+/* Menyembunyikan ikon kalender bawaan */
+.custom-date-field input::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+}
+</style>
 
 <route lang="yaml">
   meta:

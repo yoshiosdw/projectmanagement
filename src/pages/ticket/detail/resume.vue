@@ -32,7 +32,6 @@ const Rejected = ref()
 const isLoading = ref(false)
 const data = ref()
 
-console.log('fromdate', props.fromDate)
 const fetchCount = async () => {
   try {
     const typeName = props.typeName

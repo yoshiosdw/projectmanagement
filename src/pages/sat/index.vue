@@ -101,10 +101,10 @@ const findSat = async () => {
 
 const statusOptions = [
   { text: 'Open', value: 0 },
-  { text: 'On Process', value: 1 },
+  { text: 'On Progress', value: 1 },
   { text: 'Revised', value: 2 },
   { text: 'Canceled', value: 3 },
-  { text: 'Reject', value: 4 },
+  { text: 'Rejected', value: 4 },
   { text: 'Revoked', value: 5 },
   { text: 'Closed', value: 9 },
 ]
@@ -182,10 +182,12 @@ const btnRevisedClickHandler = id => {
 }
 
 const cancelData = async id => {
+  loading.value = true
   try {
     const ret = await axiosIns.patch(`/job/orders/cancel/${id}`, null )
 
     fetchJoborder(jobOrderStore.page, jobOrderStore.perPage, find.value, selectedStatus.value, jobOrderStore.pic, jobOrderStore.task)
+    loading.value = false
   } catch(error) {
     Swal.fire({
       title: 'LBG',
@@ -341,10 +343,12 @@ const exportClickHandler = async () => {
 }
 
 const revokedData = async id => {
+  loading.value = true
   try {
     const ret = await axiosIns.patch(`job/orders/revoked/data/${id}`)
 
     fetchJoborder(jobOrderStore.page, jobOrderStore.perPage, find.value, selectedStatus.value, jobOrderStore.pic, jobOrderStore.task)
+    loading.value = false
   } catch (error) {
     Swal.fire({
       title: 'LBG',
@@ -535,8 +539,9 @@ const handleOutStanding = val => {
                               class="me-3"
                               icon="tabler:browser-check"
                             />
+                            Task
                           </template>
-                          <VListItemTitle>Task</VListItemTitle>
+                          <!-- <VListItemTitle>Task</VListItemTitle> -->
                         </VListItem>
                         <VListItem
                           v-if="data.status_name === 'Revised'"
@@ -585,7 +590,7 @@ const handleOutStanding = val => {
                               size="24"
                               class="me-3"
                             />
-                            Revised
+                            Revise
                           </template>
                         </VListItem>
                         <VListItem
@@ -615,7 +620,7 @@ const handleOutStanding = val => {
                               size="24"
                               class="me-3"
                             />
-                            Revoked
+                            Revoke
                           </template>
                         </VListItem>
                         <!-- <VDivider /> -->
@@ -631,8 +636,9 @@ const handleOutStanding = val => {
                               size="24"
                               icon="tabler-trash"
                             />
+                            Delete
                           </template>
-                          <VListItemTitle>Delete</VListItemTitle>
+                          <!-- <VListItemTitle>Delete</VListItemTitle> -->
                         </VListItem>
                       </VList>
                     </VMenu>
