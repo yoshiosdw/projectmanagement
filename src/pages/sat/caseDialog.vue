@@ -89,7 +89,7 @@ const cancelClickHandler = () => {
           class="me-3"
           icon="tabler-check"
         />
-        Closed
+        Close
       </VListItemTitle>
     </template>
     <VCard>
