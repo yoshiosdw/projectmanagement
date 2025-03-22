@@ -326,9 +326,9 @@ const prioritycolor = description => {
       text: 'Highest',
       icon: 'tabler:chevrons-up', color: 'error',
     }
-  } else if (description === 'Hight') {
+  } else if (description === 'High') {
     return {
-      text: 'Hight',
+      text: 'High',
       icon: 'tabler:chevron-up', color: 'error',
     }
   } else if (description === 'Medium') {
