@@ -408,10 +408,20 @@ const exportData = async () => {
 const paginationData = computed(()=>{
   return `Showing ${projectStore.from} to ${projectStore.to} of ${projectStore.total}`
 })
+
+// const handleStatusProject = val => {
+//   // const statusCode = val
+//   statusCode.value = val
+//   console.log('status', statusCode)
+//   // jobOrderStore.task= task //misal diganti dengan const statusCode
+// }
 </script>
 
 <template>
   <VRow>
+   <!-- <VCol cols="12">
+      <StatusProject @statusproject="handleStatusProject"/>
+    </VCol> -->
     <VCol cols="12">
       <VOverlay v-model="showLoading" />
       <VCard :loading="showLoading">
