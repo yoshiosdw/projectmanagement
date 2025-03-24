@@ -10,5 +10,7 @@ export const useProject = defineStore("useProjectStore", {
     last: 0,
     from: 1,
     to: 1,
+    clickedStatus: null,
+    statusCode: null
   }),
 });
