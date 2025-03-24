@@ -9,8 +9,11 @@ import Swal from 'sweetalert2'
 import Edit from './edit.vue'
 import Start from './start.vue'
 import { useRoute } from 'vue-router'
+import { useProject } from './useProjectStore'
+import StatusProject from './dashboardList.vue'
 
 const route = useRoute()
+const projectStore = useProject()
 const toast = useToast()
 const perPage = ref(10)
 const page = ref(1)
@@ -54,10 +57,10 @@ const fetchProject = async (page, perPage, find) => {
     projects.value = ret.data.data
     
     // getStatus.value = projects.value.project_status?.description
-    total.value = ret.data.meta.total
-    last.value = ret.data.meta.last
-    to.value = ret.data.meta.to
-    from.value = ret.data.meta.from
+    projectStore.total = ret.data.meta.total
+    projectStore.last = ret.data.meta.last
+    projectStore.to = ret.data.meta.to
+    projectStore.from = ret.data.meta.from
   } catch (error) {
     console.log(error)
     toast.error('Failed Load Data')
@@ -97,13 +100,13 @@ const fetchPriority = async () => {
 }
 
 const search = () => {
-  page.value = 1
-  perPage.value = 10
+  projectStore.page = 1
+  projectStore.perPage = 10
   find.value = findText.value
 }
 
 watchEffect(() => {
-  fetchProject(page.value, perPage.value, find.value),
+  fetchProject(projectStore.page, projectStore.perPage, find.value),
   fetchStatus(),
   fetchPriority()
 })
@@ -114,7 +117,7 @@ const deleteData = async id => {
   try {
     const ret = await axiosIns.delete(`/projects/${id}` )
 
-    fetchProject(page.value, perPage.value, find.value),
+    fetchProject(projectStore.page, projectStore.perPage, find.value),
 
     showLoading.value = false
 
@@ -151,7 +154,7 @@ const editLine = id => {
 
 const getSavedEditLine = val => {
   getEdit.value = val
-  fetchProject(page.value, perPage.value, find.value)
+  fetchProject(projectStore.page, projectStore.perPage, find.value)
   isEdit.value = false
 }
 
@@ -182,7 +185,7 @@ const startProject = async id => {
   try {
     const ret = await axiosIns.post(`/projects/execution/inProgress/${id}` )
 
-    fetchProject(page.value, perPage.value, find.value),
+    fetchProject(projectStore.page, projectStore.perPage, find.value),
 
     showLoading.value = false
 
@@ -218,7 +221,7 @@ const endProject = async id => {
   try {
     const ret = await axiosIns.post(`/projects/execution/done/${id}` )
 
-    fetchProject(page.value, perPage.value, find.value),
+    fetchProject(projectStore.page, projectStore.perPage, find.value),
 
     showLoading.value = false
 
@@ -254,7 +257,7 @@ const holdProject = async id => {
   try {
     const ret = await axiosIns.post(`/projects/execution/hold/${id}` )
 
-    fetchProject(page.value, perPage.value, find.value),
+    fetchProject(projectStore.page, projectStore.perPage, find.value),
 
     showLoading.value = false
 
@@ -403,10 +406,7 @@ const exportData = async () => {
 }
 
 const paginationData = computed(()=>{
-  const firstIndex = page.value == 1 ? 1 : perPage.value * page.value + 1
-  const lastIndex = page.value * perPage.value
-  
-  return `Showing ${firstIndex} to ${lastIndex} of ${total.value}`
+  return `Showing ${projectStore.from} to ${projectStore.to} of ${projectStore.total}`
 })
 </script>
 
@@ -420,7 +420,7 @@ const paginationData = computed(()=>{
             <VCardText class="d-flex gap-4">
               <div style="min-width: 80px;">
                 <VSelect 
-                  v-model="perPage"
+                  v-model="projectStore.perPage"
                   :items="[10,20,30,50]"
                 />
               </div>
@@ -465,7 +465,7 @@ const paginationData = computed(()=>{
               <Project
                 :ticket-data="ticketTransferId"
                 @closed="getClosed"
-                @saved="fetchProject(page.value, perPage.value, find.value)"
+                @saved="fetchProject(projectStore.page, projectStore.perPage, find.value)"
               />
             </VCardText>
           </VCol>
@@ -799,10 +799,10 @@ const paginationData = computed(()=>{
           </span>
 
           <VPagination
-            v-model="page"
+            v-model="projectStore.page"
             size="small"
             :total-visible="5"
-            :length="last"
+            :length="projectStore.last"
           />
         </VCardText>
       </VCard>
