@@ -14,7 +14,7 @@ import Line from './line/[line].vue'
 import Team from '@/pages/lookup/lookupTeamProject.vue'
 import Ticket from '@/pages/lookup/ticket.vue'
 import AppDateTimePicker from '@/@core/components/AppDateTimePicker.vue'
-import { formatDateTimeMySql, getCurrentDateTimeWIB } from '@/@core/utils/formatters'
+import { formatDateTimeMySql, getCurrentDateTimeWIB, getCurrentDate } from '@/@core/utils/formatters'
 import { VDateInput } from 'vuetify/lib/labs/components.mjs'
 
 const props = defineProps({
@@ -31,6 +31,7 @@ const Projectpriority = ref()
 const projectStatus = ref()
 const priority = ref()
 const status = ref()
+const attachment = ref()
 
 const isVisible = ref(false)
 const isVisibleLine = ref(false)
@@ -171,7 +172,9 @@ const fetchTicketId = async id => {
     ticketTransferDocNo.value = ticketTransfer.value?.document_number
     ticketTransferDesc.value = ticketTransfer.value?.description
     ticketTransferRequestor.value = ticketTransfer.value?.user?.person?.name
-
+    
+    planStart.value = getCurrentDate(ticketTransfer.value?.plan_start)
+    planEnd.value = getCurrentDate(ticketTransfer.value?.target_end)
   } catch (error) {
     console.log(error)
     toast.error('Failed Load Data')
@@ -207,6 +210,8 @@ watchEffect(() => {
 
 const closeDialog = () => {
   isVisible.value = false
+
+  ticketTransferId.value = null
 
   ticketTransferDesc.value = null
   ticketTransferDocNo.value = null
@@ -350,6 +355,7 @@ const validateFom = ()=>{
                 <VTextField
                   v-model="displayTicketDocNo"
                   label="Ticket Number"
+                  variant="filled"
                   readonly
                 />
                 <Ticket
@@ -357,10 +363,12 @@ const validateFom = ()=>{
                   @ticket="getTicket"
                 />
               </VCol>
-              <VCol cols="8">
+              <VCol cols="8"
+              class="d-flex gap-3">
                 <VTextField
                   v-model="displayTicketRequestor"
                   label="Ticket Requestor"
+                  variant="filled"
                   readonly
                 />
               </VCol>
@@ -371,6 +379,7 @@ const validateFom = ()=>{
                 <VTextarea
                   v-model="displayTicketDescription"
                   label="Ticket Description"
+                  variant="filled"
                   readonly
                   rows="2"
                 />
@@ -379,7 +388,8 @@ const validateFom = ()=>{
             
             
             <VRow>
-              <VCol cols="3">
+              <VCol cols="3"
+              class="d-flex gap-3">
                 <VAutocomplete
                   v-model="priority"
                   item-value="code"
