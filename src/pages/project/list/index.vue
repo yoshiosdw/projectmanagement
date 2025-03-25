@@ -630,7 +630,6 @@ const paginationData = computed(()=>{
                       color="default"
                       size="22"
                       title="View More"
-                      :disabled="data.status === 2"
                     >
                       <VIcon
                         :size="22"
@@ -691,7 +690,7 @@ const paginationData = computed(()=>{
                           <VDivider />
 
                           <VListItem
-                            v-if="data.status !== 3"
+                            v-if="data.status !== 3 && data.status !== 2"
                             @click="btnHoldHandler(data.id)"
                           >
                             <VListItemTitle>
