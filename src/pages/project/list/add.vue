@@ -211,9 +211,9 @@ watchEffect(() => {
 
 const closeDialog = () => {
   isVisible.value = false
+  router.replace({ name: 'project-list' }).
 
   ticketTransferId.value = null
-
   ticketTransferDesc.value = null
   ticketTransferDocNo.value = null
   ticketTransferRequestor.value = null
@@ -295,6 +295,7 @@ const validateFom = ()=>{
   refForm.value?.validate().then(({ valid: isValid })=>{
     if(isValid){
       createProject()
+      closeDialog()
     }
   })
 }
