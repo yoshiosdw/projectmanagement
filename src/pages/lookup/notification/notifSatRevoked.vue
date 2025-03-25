@@ -33,7 +33,7 @@ const satId = computed(() => props.satId)
 const toast = useToast()
 const satNo = ref()
 const joNo = ref()
-const rejectBy = ref()
+const revokedBy = ref()
 const rejectTime = ref()
 const rejectDate = ref()
 const note = ref()
@@ -49,19 +49,18 @@ const fetchNotification = async id => {
   isVisible.value = true
   try {
    
-    const response = await axiosIns.get(`/job/order/takses/${id}`, {
+    const response = await axiosIns.get(`/notification/${id}`, {
     })
 
     satNotif.value = response.data.data[0]
-    satNo.value = satNotif.value?.job_order?.document_number
-    joNo.value = satNotif.value?.job_order?.bill_number
-    rejectBy.value = satNotif.value?.user?.person?.name
-    rejectTime.value = satNotif.value?.job_order?.updated_at
-    rejectDate.value = satNotif.value?.job_order?.document_date
+    satNo.value = satNotif.value?.sat_number
+    joNo.value = satNotif.value?.jo_number
+    revokedBy.value = satNotif.value?.processed_by_sat
+    rejectDate.value = satNotif.value?.created_at
     note.value = satNotif.value?.note
     status.value = satNotif.value?.status_sat
 
-    satTaskId.value = satNotif.value?.sat_job_order_id
+    satTaskId.value = satNotif.value?.job_order_task_id
 
   } catch (error) {
     toast.error('Gagal memuat data')
@@ -102,18 +101,18 @@ const navigateToTask = () => {
 
     <VCard>
       <VCardTitle>
-        Detail Rejected
+        Detail Revoked
       </VCardTitle>
       <VCardText>
         <VRow>
-          <VCol cols="4">
+          <VCol cols="6">
             <VTextField 
               v-model="satNo"
               label="Sat Number"
               variant="filled"
             />
           </VCol>
-          <VCol cols="4">
+          <VCol cols="6">
             <VTextField 
               v-model="joNo"
               label="Jo Number"
@@ -122,24 +121,17 @@ const navigateToTask = () => {
           </VCol>
         </VRow>
         <VRow>
-          <VCol cols="4">
+          <VCol cols="6">
             <VTextField 
-              v-model="rejectBy"
-              label="Rejected By"
+              v-model="revokedBy"
+              label="Revoked By"
               variant="filled"
             />
           </VCol>
-          <VCol cols="4">
+          <VCol cols="6">
             <VTextField 
               v-model="rejectDate"
-              label="Rejected Date"
-              variant="filled"
-            />
-          </VCol>
-          <VCol cols="4">
-            <VTextField 
-              v-model="rejectTime"
-              label="Rejected Time"
+              label="Revoked Date"
               variant="filled"
             />
           </VCol>

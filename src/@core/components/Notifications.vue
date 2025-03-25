@@ -7,6 +7,7 @@ import { computed, defineProps, onMounted, ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 import { formatDateMySql } from '../utils/formatters'
 import NotifDialog from '@/pages/lookup/notification/notifSat.vue'
+import NotifDialogRevoked from '@/pages/lookup/notification/notifSatRevoked.vue'
 
 const props = defineProps({
   badgeProps: {
@@ -28,6 +29,8 @@ const notifdata = ref([])
 const loading = ref(false)
 const isNotif = ref(false)
 const router = useRouter()
+
+const isNotifSatRevoked = ref(false)
 
 const getNotifications = computed(() => notificationsStore.notifications)
 const getNotificationSat = computed(() => notificationsStore.notifSATList)
@@ -89,9 +92,16 @@ const handleIctStaffRole = (notification, userId) => {
          (ability.can('Approver', 'ICT Ticket') && notification.message === 'New Ticket')
 }
 
+const statusSat = ref()
+const inboxId = ref()
 
-const markAsRead = async (notificationId, jobOrderId) => {
+const markAsRead = async (notificationId, jobOrderId, status) => {
   satId.value = jobOrderId
+  statusSat.value = status
+  inboxId.value = notificationId
+
+  console.log("Status SAT:", statusSat.value)
+
   try {
     const notification = notifdata.value.find(n => n.id === notificationId)
 
@@ -102,11 +112,21 @@ const markAsRead = async (notificationId, jobOrderId) => {
       await navigateToAssignTicket(notification.ticket_id)
     }
 
-    if (jobOrderId !== null) {
+    if (jobOrderId !== null && status === "Reject") {
       isNotif.value = true
-    } else {
+      isNotifSatRevoked.value = false
+    }
+
+    if (statusSat.value === "Revoked") {
+      isNotifSatRevoked.value = true
+      isNotif.value = false
+    }
+
+    // Jika statusSat tidak null, tidak menjalankan delete
+    if (!statusSat.value) {
       await axiosIns.delete(`/notification/deletedBy/${notificationId}`)
     }
+
     fetchNotifications()
   } catch (error) {
     console.error(error)
@@ -123,7 +143,7 @@ const navigateToAssignTicket = async ticketId => {
 
 const getClosed = async () => {
   isNotif.value = false
-  await axiosIns.delete(`/notification/deletedBy/${satId.value}`)
+  await axiosIns.delete(`/notification/deletedBy/${inboxId.value}`)
 }
 
 const markAllAsRead = async () => {
@@ -206,7 +226,7 @@ watch(() => notificationsStore.notifTrigger, () => {
               link
               lines="one"
               min-height="66px"
-              @click="markAsRead(notification.id, notification.job_order_task_id)"
+              @click="markAsRead(notification.id, notification.job_order_task_id, notification.status_sat ?? null)"
             >
               <template #prepend>
                 <VListItemAction start>
@@ -242,6 +262,12 @@ watch(() => notificationsStore.notifTrigger, () => {
     <NotifDialog
       v-if="isNotif"
       :sat-id="satId"
+      @close="getClosed"
+      @route-close="getClosed"
+    />
+    <NotifDialogRevoked 
+      v-if="isNotifSatRevoked"
+      :sat-id="inboxId"
       @close="getClosed"
       @route-close="getClosed"
     />
