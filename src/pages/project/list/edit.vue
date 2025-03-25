@@ -215,7 +215,7 @@ watchEffect(() =>{
 const editProject = async id => {
   showLoading.value = true
   try {
-    const ret = await axiosIns.patch(`/projects/${id}`, {
+    const ret = await axiosIns.post(`/projects/${id}`, {
       name            : name.value,
       description     : description.value,
       priority_id     : priority.value.code || priorityOldId.value,

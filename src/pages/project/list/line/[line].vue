@@ -351,7 +351,7 @@ const endProject = async id => {
   showLoading.value = true
 
   try {
-    const ret = await axiosIns.post(`/project/line/execution/done/${id}` )
+    const ret = await axiosIns.patch(`/project/line/execution/done/${id}` )
 
     fetchProjectLine(projectId.value, page.value, perPage.value, find.value)
 
