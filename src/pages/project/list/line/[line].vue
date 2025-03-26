@@ -26,6 +26,7 @@ const Projectpriority = ref()
 const projectType = ref()
 const priority = ref()
 const status = ref()
+const attachment = ref()
 
 const isVisible = ref(false)
 const refForm = ref()
@@ -115,6 +116,7 @@ const fetchProjectId = async projectId => {
     planEnd.value = projects.value.plan_end || ''
     ActualStart.value = projects.value.actual_start || ''
     ActualEnd.value = projects.value.actual_end || ''
+    attachment.value = projects.value.attachment_original_name || ''
   } catch (error) {
     console.log(error)
     toast.error('Failed Load Data')
@@ -521,6 +523,12 @@ const btnHoldHandler = id => {
                   variant="filled"
                   readonly
                   :rules="[requiredValidator]"
+                />
+                <VTextField
+                  v-model="attachment"
+                  label="Attachment"
+                  variant="filled"
+                  readonly
                 />
               </VCol>
             </VRow>
