@@ -14,7 +14,7 @@ import Line from './line/[line].vue'
 import Team from '@/pages/lookup/lookupTeamProject.vue'
 import Ticket from '@/pages/lookup/ticket.vue'
 import AppDateTimePicker from '@/@core/components/AppDateTimePicker.vue'
-import { formatDateTimeMySql, getCurrentDateTimeWIB } from '@/@core/utils/formatters'
+import { formatDateTimeMySql, getCurrentDateTimeWIB, getCurrentDate } from '@/@core/utils/formatters'
 import { VDateInput } from 'vuetify/lib/labs/components.mjs'
 
 const props = defineProps({
@@ -31,6 +31,8 @@ const Projectpriority = ref()
 const projectStatus = ref()
 const priority = ref()
 const status = ref()
+const attachment = ref()
+const attachFile = ref()
 
 const isVisible = ref(false)
 const isVisibleLine = ref(false)
@@ -171,7 +173,9 @@ const fetchTicketId = async id => {
     ticketTransferDocNo.value = ticketTransfer.value?.document_number
     ticketTransferDesc.value = ticketTransfer.value?.description
     ticketTransferRequestor.value = ticketTransfer.value?.user?.person?.name
-
+    
+    planStart.value = getCurrentDate(ticketTransfer.value?.plan_start)
+    planEnd.value = getCurrentDate(ticketTransfer.value?.target_end)
   } catch (error) {
     console.log(error)
     toast.error('Failed Load Data')
@@ -207,7 +211,9 @@ watchEffect(() => {
 
 const closeDialog = () => {
   isVisible.value = false
+  router.replace({ name: 'project-list' }).
 
+  ticketTransferId.value = null
   ticketTransferDesc.value = null
   ticketTransferDocNo.value = null
   ticketTransferRequestor.value = null
@@ -215,22 +221,41 @@ const closeDialog = () => {
   emit('closed', true)
 }
 
+
+const handleFileChange = event => {
+  attachFile.value = event.target.files[0]
+}
+
 const createProject = async () => {
   showLoading.value = true
   try {
-    const ret = await axiosIns.post('/projects', {
-      name            : name.value,
-      description     : description.value,
-      priority_id     : priority.value,
-      project_team_id : teamId.value,
-      plan_start      : formatDateTimeMySql(planStart.value),
-      plan_end        : formatDateTimeMySql(planEnd.value),
-      actual_start    : ActualStart.value,
-      actual_end      : ActualEnd.value,
-      ticket_id       : ticketId.value,
-      biu_id          : biu.value,
-      project_department_id       : department.value,
-    } )
+    const allowedMimeTypes = ['application/pdf']
+
+    const formData = new FormData();
+
+    formData.append('name', name.value);
+    formData.append('description', description.value);
+    formData.append('priority_id', priority.value);
+    formData.append('project_team_id', teamId.value);
+    formData.append('plan_start', formatDateTimeMySql(planStart.value));
+    formData.append('plan_end', formatDateTimeMySql(planEnd.value));
+    formData.append('actual_start', ActualStart?.value ?? '');
+    formData.append('actual_end', ActualEnd?.value ?? '');
+    formData.append('ticket_id', ticketId.value);
+    formData.append('biu_id', biu.value);
+    formData.append('project_department_id', department.value);
+    
+    if (attachFile.value) {
+      formData.append('attachment', attachFile.value);
+    }
+
+    const ret = await axiosIns.post('/projects', formData, {
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem("sinarjoAccessToken"),
+        'Content-Type': 'multipart/form-data',
+        'Accept': allowedMimeTypes.join(','),
+      },
+    });
 
     projectId.value = ret.data.data.id
     emit('saved', true)
@@ -270,6 +295,7 @@ const validateFom = ()=>{
   refForm.value?.validate().then(({ valid: isValid })=>{
     if(isValid){
       createProject()
+      closeDialog()
     }
   })
 }
@@ -350,6 +376,7 @@ const validateFom = ()=>{
                 <VTextField
                   v-model="displayTicketDocNo"
                   label="Ticket Number"
+                  variant="filled"
                   readonly
                 />
                 <Ticket
@@ -357,10 +384,12 @@ const validateFom = ()=>{
                   @ticket="getTicket"
                 />
               </VCol>
-              <VCol cols="8">
+              <VCol cols="8"
+              class="d-flex gap-3">
                 <VTextField
                   v-model="displayTicketRequestor"
                   label="Ticket Requestor"
+                  variant="filled"
                   readonly
                 />
               </VCol>
@@ -371,6 +400,7 @@ const validateFom = ()=>{
                 <VTextarea
                   v-model="displayTicketDescription"
                   label="Ticket Description"
+                  variant="filled"
                   readonly
                   rows="2"
                 />
@@ -379,7 +409,8 @@ const validateFom = ()=>{
             
             
             <VRow>
-              <VCol cols="3">
+              <VCol cols="3"
+              class="d-flex gap-3">
                 <VAutocomplete
                   v-model="priority"
                   item-value="code"
@@ -431,6 +462,15 @@ const validateFom = ()=>{
                   @click="openDatePicker"
                 />
               </VCol>
+              <VCol cols="4">
+                <VFileInput 
+                label="Attach file" 
+                v-model="attachment" 
+                @change="handleFileChange" 
+                accept=".pdf"
+                density="comfortable"
+                />
+            </VCol>
             </VRow>
             <VRow class="mt-3">
               <VCol

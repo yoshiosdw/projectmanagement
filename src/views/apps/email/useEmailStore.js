@@ -1,7 +1,7 @@
-import axios from '@axios'
+import axiosIns from '@/plugins/axios'
+import { defineStore } from 'pinia'
 
 export const useEmailStore = defineStore('email', {
-  // ℹ️ arrow function recommended for full type inference
   state: () => ({
     emails: [],
     emailsMeta: {
@@ -10,25 +10,15 @@ export const useEmailStore = defineStore('email', {
       spam: 0,
     },
   }),
-  actions: {
-    async fetchEmails(payload) {
-      const response = await axios.get('/apps/email/emails', { params: payload })
-      const { emails, emailsMeta } = response.data
-
-      this.emails = emails
-      this.emailsMeta = emailsMeta
-    },
-    async updateEmails(ids, data) {
-      return axios.post('/apps/email/update-emails/', {
-        ids,
-        data,
-      })
-    },
-    async updateEmailLabels(ids, label) {
-      return axios.post('/apps/email/update-emails-label', {
-        ids,
-        label,
-      })
-    },
-  },
+  // actions: {
+  //   async fetchEmails() {
+  //     try {
+  //       const response = await axiosIns.get('/notifications/inbox')
+        
+  //       this.emails = response.data.data
+  //     } catch (error) {
+  //       console.error('Error fetching emails:', error)
+  //     }
+  //   },
+  // },
 })
