@@ -74,6 +74,11 @@ const bisnisUnits = ref([])
 const biu = ref()
 const biuOldId = ref()
 
+
+const attachment = ref()
+const attachFile = ref()
+const attachName = ref()
+
 const openDatePicker = event => {
   event.target.showPicker() 
 }
@@ -143,7 +148,7 @@ const fetchProjectId = async headerId => {
     })
 
     showLoading.value = false
-    projectLineData.value = ret.data.data[0]
+    projectLineData.value = ret.data.data
 
     department.value = projectLineData.value.project_department?.description || ''
     departmentOldId.value = projectLineData.value.project_department_id
@@ -168,7 +173,8 @@ const fetchProjectId = async headerId => {
 
     ActualStart.value = projectLineData.value.actual_start
     ActualEnd.value = projectLineData.value.actual_end
-
+    
+    attachName.value = projectLineData.value.attachment
   } catch (error) {
     console.log(error)
     toast.error('Failed Load Data')
@@ -212,40 +218,87 @@ watchEffect(() =>{
   fetchBiu()
 })
 
-const editProject = async id => {
-  showLoading.value = true
+const editProject = async (id) => {
+  showLoading.value = true;
   try {
-    const ret = await axiosIns.patch(`/projects/${id}`, {
-      name            : name.value,
-      description     : description.value,
-      priority_id     : priority.value.code || priorityOldId.value,
-      assign_to       : personId.value || personOldId.value,
-      plan_start      : formatDateTimeMySql(planStart.value),
-      plan_end        : formatDateTimeMySql(planEnd.value),
-      actual_start    : ActualStart.value,
-      actual_end      : ActualEnd.value,
-      ticket_id       : ticketId.value || ticketIdOld.value,
-      project_department_id       : department.value.id || departmentOldId.value,
-      project_team_id : teamId.value || teamOldId.value,
-      biu_id          : biu.value.id || biuOldId.value,
-    } )
+    const allowedMimeTypes = ['application/pdf']
 
-    projectId.value = ret.data.data.id
-    emit('saved', true)
-    
-    isVisible.value = false
-    isVisibleLine.value = true
-    
-    // console.log(ret.data.data.id)
-    clearForm()
-    showLoading.value = false
+    const formData = new FormData();
+
+    formData.append('name', name.value || '');
+    formData.append('description', description.value || '');
+    formData.append('priority_id', priority.value.code || priorityOldId.value || '');
+    formData.append('plan_start', formatDateTimeMySql(planStart.value) || '');
+    formData.append('plan_end', formatDateTimeMySql(planEnd.value) || '');
+    formData.append('actual_start', ActualStart.value || '');
+    formData.append('actual_end', ActualEnd.value || '');
+    formData.append('ticket_id', ticketId.value || ticketIdOld.value || '');
+    formData.append('project_department_id', department.value.id || departmentOldId.value || '');
+    formData.append('project_team_id', teamId.value || teamOldId.value || '');
+    formData.append('biu_id', biu.value.id || biuOldId.value || '');
+
+    if (attachFile.value) {
+      formData.append('attachment', attachFile.value)
+    } //masih maslaah
+
+    const ret = await axiosIns.post(`/projects/${id}`, formData, {
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('sinarjoAccessToken'),
+        'Content-Type': 'multipart/form-data',
+        'Accept': allowedMimeTypes.join(','),
+      },
+    });
+
+    projectId.value = ret.data.data.id;
+    emit('saved', true);
+
+    isVisible.value = false;
+    isVisibleLine.value = true;
+
+    clearForm();
+    showLoading.value = false;
   } catch (error) {
-    console.log(error)
-    toast.error('Failed create data')
+    console.error(error);
+    toast.error('Failed to update data');
   } finally {
-    showLoading.value = false
+    showLoading.value = false;
   }
-}
+};
+
+// const editProject = async id => {
+//   showLoading.value = true
+//   try {
+//     const ret = await axiosIns.patch(`/projects/${id}`, {
+//       name            : name.value,
+//       description     : description.value,
+//       priority_id     : priority.value.code || priorityOldId.value,
+//       assign_to       : personId.value || personOldId.value,
+//       plan_start      : formatDateTimeMySql(planStart.value),
+//       plan_end        : formatDateTimeMySql(planEnd.value),
+//       actual_start    : ActualStart.value,
+//       actual_end      : ActualEnd.value,
+//       ticket_id       : ticketId.value || ticketIdOld.value,
+//       project_department_id       : department.value.id || departmentOldId.value,
+//       project_team_id : teamId.value || teamOldId.value,
+//       biu_id          : biu.value.id || biuOldId.value,
+//     } )
+
+//     projectId.value = ret.data.data.id
+//     emit('saved', true)
+    
+//     isVisible.value = false
+//     isVisibleLine.value = true
+    
+//     // console.log(ret.data.data.id)
+//     clearForm()
+//     showLoading.value = false
+//   } catch (error) {
+//     console.log(error)
+//     toast.error('Failed create data')
+//   } finally {
+//     showLoading.value = false
+//   }
+// }
 
 const clearForm = () => {
   ticketNumber.value = null
@@ -277,6 +330,9 @@ const validateFom = ()=>{
       editProject(props.headerId)
     }
   })
+}
+const handleFileChange = event => {
+  attachFile.value = event.target.files[0]
 }
 </script>
 
@@ -429,6 +485,22 @@ const validateFom = ()=>{
                   @click="openDatePicker"
                 />
               </VCol>
+              <VCol cols="6">
+                <VTextField 
+                  v-model="attachName"
+                  label="Existing Attched File"
+                  readonly
+                />
+              </VCol>
+              <VCol cols="4">
+                <VFileInput 
+                label="Attach file" 
+                v-model="attachment" 
+                @change="handleFileChange" 
+                accept=".pdf"
+                density="comfortable"
+                />
+            </VCol>
             </VRow>
             <VRow class="mt-3">
               <VCol
