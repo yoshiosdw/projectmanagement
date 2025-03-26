@@ -82,6 +82,11 @@ const projectLineId = ref()
 const findText = ref('')
 const department = ref('')
 const requestorTicket = ref('')
+const requestorPerson = ref('')
+
+const displayRequestor = computed(() => {
+  return requestorTicket.value || requestorPerson.value
+})
 
 const fetchProjectId = async projectId => {
   isVisible.value = true
@@ -98,6 +103,7 @@ const fetchProjectId = async projectId => {
     ticketDescription.value = projects.value.ticket?.description
 
     requestorTicket.value = projects.value.ticket?.user?.person?.name
+    requestorPerson.value = projects.value.requestor?.person?.name
 
     name.value = projects.value.name
     description.value = projects.value.description
@@ -477,7 +483,7 @@ const btnHoldHandler = id => {
               </VCol>
               <VCol cols="8">
                 <VTextField
-                  v-model="requestorTicket"
+                  v-model="displayRequestor"
                   label="Ticket Requestor"
                   readonly
                   variant="filled"
