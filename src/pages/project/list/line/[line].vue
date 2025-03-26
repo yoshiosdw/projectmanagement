@@ -26,6 +26,7 @@ const Projectpriority = ref()
 const projectType = ref()
 const priority = ref()
 const status = ref()
+const attachment = ref()
 
 const isVisible = ref(false)
 const refForm = ref()
@@ -82,6 +83,11 @@ const projectLineId = ref()
 const findText = ref('')
 const department = ref('')
 const requestorTicket = ref('')
+const requestorPerson = ref('')
+
+const displayRequestor = computed(() => {
+  return requestorTicket.value || requestorPerson.value
+})
 
 const fetchProjectId = async projectId => {
   isVisible.value = true
@@ -91,13 +97,14 @@ const fetchProjectId = async projectId => {
     })
 
     showLoading.value = false
-    projects.value = ret.data.data[0]
+    projects.value = ret.data.data
 
     department.value = projects.value.project_department?.description
     ticketNumber.value = projects.value.ticket?.document_number
     ticketDescription.value = projects.value.ticket?.description
 
     requestorTicket.value = projects.value.ticket?.user?.person?.name
+    requestorPerson.value = projects.value.requestor?.person?.name
 
     name.value = projects.value.name
     description.value = projects.value.description
@@ -109,6 +116,7 @@ const fetchProjectId = async projectId => {
     planEnd.value = projects.value.plan_end || ''
     ActualStart.value = projects.value.actual_start || ''
     ActualEnd.value = projects.value.actual_end || ''
+    attachment.value = projects.value.attachment_original_name || ''
   } catch (error) {
     console.log(error)
     toast.error('Failed Load Data')
@@ -477,7 +485,7 @@ const btnHoldHandler = id => {
               </VCol>
               <VCol cols="8">
                 <VTextField
-                  v-model="requestorTicket"
+                  v-model="displayRequestor"
                   label="Ticket Requestor"
                   readonly
                   variant="filled"
@@ -515,6 +523,12 @@ const btnHoldHandler = id => {
                   variant="filled"
                   readonly
                   :rules="[requiredValidator]"
+                />
+                <VTextField
+                  v-model="attachment"
+                  label="Attachment"
+                  variant="filled"
+                  readonly
                 />
               </VCol>
             </VRow>
@@ -577,14 +591,7 @@ const btnHoldHandler = id => {
         <VRow>
           <VCol cols="12">
             <VCardText class="d-flex justify-between gap-4">
-              <!--
-                <div style="min-width: 80px;">
-                <VSelect 
-                  v-model="perPage"
-                  :items="[10,20,30,50]"
-                  />
-                </div>
-                -->
+              
               <div style="margin-left: auto;">
                 <AddLine
                   :header-id="projectId"
@@ -829,17 +836,6 @@ const btnHoldHandler = id => {
           </VTable>
         </VCardText>
         <VCardText class="d-flex align-center flex-wrap justify-space-between gap-4 py-3 px-5">
-          <!--
-            <span class="text-sm text-disabled">
-            {{ paginationData }}
-          </span>
-          <VPagination
-            v-model="page"
-            size="small"
-            :total-visible="5"
-            :length="last"
-          />
-            -->
 
         </VCardText>
       </VCard>

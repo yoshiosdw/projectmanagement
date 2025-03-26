@@ -63,7 +63,6 @@ const teamId = ref()
 const teamName = ref()
 
 const ticketRequestor = ref()
-
 const projectDepartment = ref()
 const department = ref()
 const departmentOldId = ref()
@@ -73,6 +72,15 @@ const projectLineData = ref()
 const bisnisUnits = ref([])
 const biu = ref()
 const biuOldId = ref()
+
+
+const attachment = ref()
+const attachFile = ref()
+const attachName = ref()
+
+const displayTicketRequestor = computed(() => {
+  return  ticketRequestor.value || person.value 
+})
 
 const openDatePicker = event => {
   event.target.showPicker() 
@@ -102,9 +110,9 @@ const getTicket = val => {
   ticketDescription.value = val.description
 
   ticketId.value = val.id
+  console.log(ticketRequestor.value)
 
 }
-
 const fetchPriority = async () => {
   showLoading.value = true
   try {
@@ -143,7 +151,7 @@ const fetchProjectId = async headerId => {
     })
 
     showLoading.value = false
-    projectLineData.value = ret.data.data[0]
+    projectLineData.value = ret.data.data
 
     department.value = projectLineData.value.project_department?.description || ''
     departmentOldId.value = projectLineData.value.project_department_id
@@ -153,6 +161,8 @@ const fetchProjectId = async headerId => {
 
     ticketNumber.value = projectLineData.value.ticket?.document_number
     ticketDescription.value = projectLineData.value.ticket?.description
+    ticketRequestor.value = projectLineData.value.ticket?.user.person.name
+    person.value = projectLineData.value.requestor?.person?.name
 
     teamName.value = projectLineData.value.team?.description || ''
     teamOldId.value = projectLineData.value.team?.id
@@ -168,7 +178,8 @@ const fetchProjectId = async headerId => {
 
     ActualStart.value = projectLineData.value.actual_start
     ActualEnd.value = projectLineData.value.actual_end
-
+    
+    attachName.value = projectLineData.value.attachment_original_name
   } catch (error) {
     console.log(error)
     toast.error('Failed Load Data')
@@ -212,40 +223,52 @@ watchEffect(() =>{
   fetchBiu()
 })
 
-const editProject = async id => {
-  showLoading.value = true
+const editProject = async (id) => {
+  showLoading.value = true;
   try {
-    const ret = await axiosIns.post(`/projects/${id}`, {
-      name            : name.value,
-      description     : description.value,
-      priority_id     : priority.value.code || priorityOldId.value,
-      assign_to       : personId.value || personOldId.value,
-      plan_start      : formatDateTimeMySql(planStart.value),
-      plan_end        : formatDateTimeMySql(planEnd.value),
-      actual_start    : ActualStart.value,
-      actual_end      : ActualEnd.value,
-      ticket_id       : ticketId.value || ticketIdOld.value,
-      project_department_id       : department.value.id || departmentOldId.value,
-      project_team_id : teamId.value || teamOldId.value,
-      biu_id          : biu.value.id || biuOldId.value,
-    } )
+    const allowedMimeTypes = ['application/pdf']
+    const formData = new FormData();
 
-    projectId.value = ret.data.data.id
-    emit('saved', true)
-    
-    isVisible.value = false
-    isVisibleLine.value = true
-    
-    // console.log(ret.data.data.id)
-    clearForm()
-    showLoading.value = false
+    formData.append('name', name.value || '');
+    formData.append('description', description.value || '');
+    formData.append('priority_id', priority.value.code || priorityOldId.value || '');
+    formData.append('plan_start', formatDateTimeMySql(planStart.value) || '');
+    formData.append('plan_end', formatDateTimeMySql(planEnd.value) || '');
+    formData.append('actual_start', ActualStart.value || '');
+    formData.append('actual_end', ActualEnd.value || '');
+    formData.append('ticket_id', ticketId.value || ticketIdOld.value || '');
+    formData.append('project_department_id', department.value.id || departmentOldId.value || '');
+    formData.append('project_team_id', teamId.value || teamOldId.value || '');
+    formData.append('biu_id', biu.value.id || biuOldId.value || '');
+    formData.append('requestor_id', personId.value || '');
+
+    if (attachFile.value) {
+      formData.append('attachment', attachFile.value)
+    }
+
+    const ret = await axiosIns.post(`/projects/${id}`, formData, {
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('sinarjoAccessToken'),
+        'Content-Type': 'multipart/form-data',
+        'Accept': allowedMimeTypes.join(','),
+      },
+    });
+
+    projectId.value = ret.data.data.id;
+    emit('saved', true);
+
+    isVisible.value = false;
+    isVisibleLine.value = true;
+
+    clearForm();
+    showLoading.value = false;
   } catch (error) {
-    console.log(error)
-    toast.error('Failed create data')
+    console.error(error);
+    toast.error('Failed to update data');
   } finally {
-    showLoading.value = false
+    showLoading.value = false;
   }
-}
+};
 
 const clearForm = () => {
   ticketNumber.value = null
@@ -277,6 +300,9 @@ const validateFom = ()=>{
       editProject(props.headerId)
     }
   })
+}
+const handleFileChange = event => {
+  attachFile.value = event.target.files[0]
 }
 </script>
 
@@ -349,17 +375,26 @@ const validateFom = ()=>{
                 <VTextField
                   v-model="ticketNumber"
                   label="Ticket Number"
+                  variant="filled"
                   readonly
                 />
                 <Ticket
                   @ticket="getTicket"
                 />
               </VCol>
-              <VCol cols="8">
+              <VCol 
+                cols="8"
+                class="d-flex gap-3">
                 <VTextField
-                  v-model="ticketRequestor"
+                  v-model="displayTicketRequestor"
                   label="Ticket Requestor"
+                  item-title="name"
+                  item-value="id"
+                  variant="filled"
+                  readonly
                 />
+                <Person
+                 @employee="getApprovalPerson" />
               </VCol>
             </VRow>
 
@@ -368,6 +403,7 @@ const validateFom = ()=>{
                 <VTextarea
                   v-model="ticketDescription"
                   label="Ticket Description"
+                  variant="filled"
                   readonly
                   rows="2"
                 />
@@ -429,6 +465,22 @@ const validateFom = ()=>{
                   @click="openDatePicker"
                 />
               </VCol>
+              <VCol cols="6">
+                <VTextField 
+                  v-model="attachName"
+                  label="Existing Attched File"
+                  readonly
+                />
+              </VCol>
+              <VCol cols="4">
+                <VFileInput 
+                label="Reattachment" 
+                v-model="attachment" 
+                @change="handleFileChange" 
+                accept=".pdf"
+                density="comfortable"
+                />
+            </VCol>
             </VRow>
             <VRow class="mt-3">
               <VCol
