@@ -63,7 +63,6 @@ const teamId = ref()
 const teamName = ref()
 
 const ticketRequestor = ref()
-
 const projectDepartment = ref()
 const department = ref()
 const departmentOldId = ref()
@@ -78,6 +77,10 @@ const biuOldId = ref()
 const attachment = ref()
 const attachFile = ref()
 const attachName = ref()
+
+const displayTicketRequestor = computed(() => {
+  return  ticketRequestor.value || person.value 
+})
 
 const openDatePicker = event => {
   event.target.showPicker() 
@@ -107,9 +110,9 @@ const getTicket = val => {
   ticketDescription.value = val.description
 
   ticketId.value = val.id
+  console.log(ticketRequestor.value)
 
 }
-
 const fetchPriority = async () => {
   showLoading.value = true
   try {
@@ -158,6 +161,8 @@ const fetchProjectId = async headerId => {
 
     ticketNumber.value = projectLineData.value.ticket?.document_number
     ticketDescription.value = projectLineData.value.ticket?.description
+    ticketRequestor.value = projectLineData.value.ticket?.user.person.name
+    person.value = projectLineData.value.requestor?.person?.name
 
     teamName.value = projectLineData.value.team?.description || ''
     teamOldId.value = projectLineData.value.team?.id
@@ -174,7 +179,7 @@ const fetchProjectId = async headerId => {
     ActualStart.value = projectLineData.value.actual_start
     ActualEnd.value = projectLineData.value.actual_end
     
-    attachName.value = projectLineData.value.attachment
+    attachName.value = projectLineData.value.attachment_original_name
   } catch (error) {
     console.log(error)
     toast.error('Failed Load Data')
@@ -236,10 +241,11 @@ const editProject = async (id) => {
     formData.append('project_department_id', department.value.id || departmentOldId.value || '');
     formData.append('project_team_id', teamId.value || teamOldId.value || '');
     formData.append('biu_id', biu.value.id || biuOldId.value || '');
+    formData.append('requestor_id', personId.value || '');
 
     if (attachFile.value) {
       formData.append('attachment', attachFile.value)
-    } //masih maslaah
+    }
 
     const ret = await axiosIns.post(`/projects/${id}`, formData, {
       headers: {
@@ -264,41 +270,6 @@ const editProject = async (id) => {
     showLoading.value = false;
   }
 };
-
-// const editProject = async id => {
-//   showLoading.value = true
-//   try {
-//     const ret = await axiosIns.patch(`/projects/${id}`, {
-//       name            : name.value,
-//       description     : description.value,
-//       priority_id     : priority.value.code || priorityOldId.value,
-//       assign_to       : personId.value || personOldId.value,
-//       plan_start      : formatDateTimeMySql(planStart.value),
-//       plan_end        : formatDateTimeMySql(planEnd.value),
-//       actual_start    : ActualStart.value,
-//       actual_end      : ActualEnd.value,
-//       ticket_id       : ticketId.value || ticketIdOld.value,
-//       project_department_id       : department.value.id || departmentOldId.value,
-//       project_team_id : teamId.value || teamOldId.value,
-//       biu_id          : biu.value.id || biuOldId.value,
-//     } )
-
-//     projectId.value = ret.data.data.id
-//     emit('saved', true)
-    
-//     isVisible.value = false
-//     isVisibleLine.value = true
-    
-//     // console.log(ret.data.data.id)
-//     clearForm()
-//     showLoading.value = false
-//   } catch (error) {
-//     console.log(error)
-//     toast.error('Failed create data')
-//   } finally {
-//     showLoading.value = false
-//   }
-// }
 
 const clearForm = () => {
   ticketNumber.value = null
@@ -405,17 +376,26 @@ const handleFileChange = event => {
                 <VTextField
                   v-model="ticketNumber"
                   label="Ticket Number"
+                  variant="filled"
                   readonly
                 />
                 <Ticket
                   @ticket="getTicket"
                 />
               </VCol>
-              <VCol cols="8">
+              <VCol 
+                cols="8"
+                class="d-flex gap-3">
                 <VTextField
-                  v-model="ticketRequestor"
+                  v-model="displayTicketRequestor"
                   label="Ticket Requestor"
+                  item-title="name"
+                  item-value="id"
+                  variant="filled"
+                  readonly
                 />
+                <Person
+                 @employee="getApprovalPerson" />
               </VCol>
             </VRow>
 
@@ -424,6 +404,7 @@ const handleFileChange = event => {
                 <VTextarea
                   v-model="ticketDescription"
                   label="Ticket Description"
+                  variant="filled"
                   readonly
                   rows="2"
                 />
@@ -494,7 +475,7 @@ const handleFileChange = event => {
               </VCol>
               <VCol cols="4">
                 <VFileInput 
-                label="Attach file" 
+                label="Reattachment" 
                 v-model="attachment" 
                 @change="handleFileChange" 
                 accept=".pdf"
