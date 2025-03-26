@@ -8,9 +8,10 @@ import { requiredValidator } from '@/@core/utils/validators'
 import Line from './line/[line].vue'
 
 
+
 // import Person from '@/pages/ticket/person.vue'
 // import Person from '@/pages/lookup/employee.vue'
-// import Person from '@/pages/lookup/employeeICT.vue'
+import Person from '@/pages/lookup/employeeICT.vue'
 import Team from '@/pages/lookup/lookupTeamProject.vue'
 import Ticket from '@/pages/lookup/ticket.vue'
 import AppDateTimePicker from '@/@core/components/AppDateTimePicker.vue'
@@ -103,6 +104,13 @@ const getTicket = val => {
 
   ticketId.value = val.id
 
+  console.log(ticketNumber.value)
+}
+
+const getPerson = val => {
+ 
+  person.value = val.person.name
+  personId.value = val.id
 }
 
 const fetchPriority = async () => {
@@ -192,7 +200,7 @@ const displayTicketDocNo = computed(() => {
 })
 
 const displayTicketRequestor = computed(() => {
-  return ticketTransferRequestor.value || ticketRequestor.value
+  return ticketTransferRequestor.value || ticketRequestor.value || person.value
 })
 
 watchEffect(() =>{
@@ -210,9 +218,9 @@ watchEffect(() => {
 })
 
 const closeDialog = () => {
+  router.replace({ name: 'project-list' });
+  
   isVisible.value = false
-  router.replace({ name: 'project-list' }).
-
   ticketTransferId.value = null
   ticketTransferDesc.value = null
   ticketTransferDocNo.value = null
@@ -244,6 +252,7 @@ const createProject = async () => {
     formData.append('ticket_id', ticketId.value);
     formData.append('biu_id', biu.value);
     formData.append('project_department_id', department.value);
+    formData.append('requestor_id', personId.value);
     
     if (attachFile.value) {
       formData.append('attachment', attachFile.value);
@@ -384,14 +393,20 @@ const validateFom = ()=>{
                   @ticket="getTicket"
                 />
               </VCol>
-              <VCol cols="8"
-              class="d-flex gap-3">
+              <VCol 
+                cols="8"
+                class="d-flex gap-3">
                 <VTextField
                   v-model="displayTicketRequestor"
                   label="Ticket Requestor"
+                  item-title="name"
+                  item-value="id"
                   variant="filled"
                   readonly
                 />
+                <Person
+                v-if="!displayTicketDocNo"
+                 @employee="getPerson" />
               </VCol>
             </VRow>
 
