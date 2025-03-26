@@ -91,7 +91,7 @@ const fetchProjectId = async projectId => {
     })
 
     showLoading.value = false
-    projects.value = ret.data.data[0]
+    projects.value = ret.data.data
 
     department.value = projects.value.project_department?.description
     ticketNumber.value = projects.value.ticket?.document_number
@@ -577,14 +577,7 @@ const btnHoldHandler = id => {
         <VRow>
           <VCol cols="12">
             <VCardText class="d-flex justify-between gap-4">
-              <!--
-                <div style="min-width: 80px;">
-                <VSelect 
-                  v-model="perPage"
-                  :items="[10,20,30,50]"
-                  />
-                </div>
-                -->
+              
               <div style="margin-left: auto;">
                 <AddLine
                   :header-id="projectId"
@@ -829,17 +822,6 @@ const btnHoldHandler = id => {
           </VTable>
         </VCardText>
         <VCardText class="d-flex align-center flex-wrap justify-space-between gap-4 py-3 px-5">
-          <!--
-            <span class="text-sm text-disabled">
-            {{ paginationData }}
-          </span>
-          <VPagination
-            v-model="page"
-            size="small"
-            :total-visible="5"
-            :length="last"
-          />
-            -->
 
         </VCardText>
       </VCard>
