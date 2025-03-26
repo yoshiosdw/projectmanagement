@@ -252,7 +252,7 @@ const createProject = async () => {
     formData.append('ticket_id', ticketId.value);
     formData.append('biu_id', biu.value);
     formData.append('project_department_id', department.value);
-    formData.append('requestor_id', personId.value);
+    formData.append('requestor_id', personId.value ?? '');
     
     if (attachFile.value) {
       formData.append('attachment', attachFile.value);
@@ -293,7 +293,7 @@ const clearForm = () => {
   priority.value = null
   status.value = null
   person.value = null
-  planStart.value = new Date()
+  planStart.value = getCurrentDateTimeWIB();
   planEnd.value = null
   biu.value = null
   teamId.value = null
@@ -405,7 +405,7 @@ const validateFom = ()=>{
                   readonly
                 />
                 <Person
-                v-if="!displayTicketDocNo"
+                v-if="!ticketTransferId && !displayTicketDocNo"
                  @employee="getPerson" />
               </VCol>
             </VRow>
