@@ -249,11 +249,15 @@ const createProject = async () => {
     formData.append('plan_end', formatDateTimeMySql(planEnd.value));
     formData.append('actual_start', ActualStart?.value ?? '');
     formData.append('actual_end', ActualEnd?.value ?? '');
-    formData.append('ticket_id', ticketId.value);
+    // formData.append('ticket_id', ticketId?.value ?? '');
+    ticketId.value || ticketTransferId.value 
+    ? formData.append('ticket_id', ticketId.value || ticketTransferId.value) : null;
     formData.append('biu_id', biu.value);
     formData.append('project_department_id', department.value);
-    formData.append('requestor_id', personId.value ?? '');
-    
+    // formData.append('requestor_id', personId.value ?? '');
+    if (personId.value) {
+      formData.append('requestor_id', personId.value);
+    }
     if (attachFile.value) {
       formData.append('attachment', attachFile.value);
     }
