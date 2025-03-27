@@ -415,6 +415,74 @@ const paginationData = computed(()=>{
 //   console.log('status', statusCode)
 //   // jobOrderStore.task= task //misal diganti dengan const statusCode
 // }
+const downloadFile = async filename => {
+  showLoading.value = true;
+  try {
+    const params = {
+      filename: filename,
+    }
+
+    const response = await axiosIns.get(`/projects/attachment/file`, {
+      params,
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem("sinarjoAccessToken"),
+      },
+      responseType: 'blob',
+    })
+
+    const fileExtension = filename.split('.').pop().toLowerCase()
+    let mimeType = ''
+
+    switch (fileExtension) {
+    case 'pdf':
+      mimeType = 'application/pdf'
+      break
+    case 'xlsx':
+      mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      break
+    default:
+      throw new Error('Unsupported file type')
+    }
+
+    const blob = new Blob([response.data], { type: mimeType })
+    const href = URL.createObjectURL(blob)
+
+    if (fileExtension === 'pdf') {
+      window.open(href, '_blank')
+    } else if (fileExtension === 'xlsx') {
+      const link = document.createElement('a')
+
+      link.href = href
+      link.download = filename
+      document.body.appendChild(link)
+      link.click()
+
+      document.body.removeChild(link)
+    }
+
+    URL.revokeObjectURL(href)
+  } catch (error) {
+    Swal.fire({
+      title: 'Task',
+      text: 'File Not Found!',
+      icon: 'error',
+    })
+  } finally {
+    showLoading.value = false
+  }
+}
+
+const truncateText = text => {
+  return `${text.substring(0, 6)}...`
+}
+
+const resolveAttachVariant = attachment => {
+  if (attachment !== null)
+    return {
+      text: attachment,
+      color: 'success',
+    }
+}
 </script>
 
 <template>
@@ -587,6 +655,12 @@ const paginationData = computed(()=>{
                   class="text-no-wrap"
                 >
                   Actual Duration (Day)
+                </th>
+                <th
+                  scope="col"
+                  class="text-no-wrap"
+                >
+                  Attachment
                 </th>
               </tr>
             </thead>
@@ -797,6 +871,26 @@ const paginationData = computed(()=>{
                 </td>
                 <td style="text-align: right;">
                   {{ data.actual_duration }}
+                </td>
+                <td
+                  style="word-wrap: break-word;"
+                  class="text-wrap"
+                >
+                  <div
+                    class="d-flex flex-column text-wrap"
+                    >
+                    <VChip 
+                    v-if="data.attachment !== null"
+                    :color="resolveAttachVariant(data.attachment).color"
+                    size="small"
+                    @click="downloadFile(data.attachment)"
+                    >
+                      {{ truncateText(data.attachment) }}
+                    </VChip>
+                    <template v-else>
+                      {{ data.attachment }}
+                    </template>
+                  </div>
                 </td>
               </tr>
             </tbody>
