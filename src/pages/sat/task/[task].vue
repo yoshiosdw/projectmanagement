@@ -11,6 +11,7 @@ import ProcessDialog from './processDialog.vue'
 import RejectDialog from './rejectDialog.vue'
 import RevisedDialog from './revisedDialog.vue'
 import PostDialogCopyDelivery from './postDialogDelivery.vue'
+import processDialogFeedbackRnd from './processDialogFeedbackRnd.vue'
 import { VDateInput } from 'vuetify/lib/labs/components.mjs'
 import { load } from 'webfontloader'
 
@@ -531,8 +532,14 @@ const resolveAttachVariant = attachment => {
                             @task-uploaded="handlePostUpdated"
                           /> 
                         </VListItem>
-                        <VListItem v-if="(data.status === 0 || data.status === 9) && ability.can(data.permissions.split(' - ')[1], data.permissions.split(' - ')[0]) && (data.task_sequence !== 4 && data.task_sequence !== 6)">
+                        <VListItem v-if="(data.status === 0 || data.status === 9) && ability.can(data.permissions.split(' - ')[1], data.permissions.split(' - ')[0]) && (data.task_sequence !== 4 && data.task_sequence !== 6 && data.task_sequence !== 3)">
                           <ProcessDialog
+                            :data="data"
+                            @task-uploaded="handlePostUpdated"
+                          />
+                        </VListItem>
+                        <VListItem v-if="(data.status === 0 || data.status === 9) && ability.can(data.permissions.split(' - ')[1], data.permissions.split(' - ')[0]) && (data.task_sequence == 3)">
+                          <processDialogFeedbackRnd
                             :data="data"
                             @task-uploaded="handlePostUpdated"
                           />
