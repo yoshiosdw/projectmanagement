@@ -9,7 +9,7 @@ import Line from './line/[line].vue'
 import { getCurrentDateTimeWIB, formatDateTimeMySql } from '@/@core/utils/formatters'
 
 // import Person from '@/pages/ticket/person.vue'
-import Person from '@/pages/lookup/employee.vue'
+import Person from '@/pages/lookup/employeeICT.vue'
 import Team from '@/pages/lookup/lookupTeamProject.vue'
 import Ticket from '@/pages/lookup/ticket.vue'
 
@@ -394,6 +394,7 @@ const handleFileChange = event => {
                   readonly
                 />
                 <Person
+                 v-if="!ticketNumber"
                  @employee="getApprovalPerson" />
               </VCol>
             </VRow>
