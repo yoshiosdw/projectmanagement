@@ -25,7 +25,6 @@ import Pusher from 'pusher-js'
 import Toast, { POSITION, useToast } from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
 import socket from './socket'
-import { useEmailStore } from './views/apps/email/useEmailStore'
 
 
 let defaultOptions = { treeName: 'blocks-tree' }
@@ -76,7 +75,6 @@ const notificationsStore = useNotificationsStore()
 notificationsStore.setNotifications([])
 
 const toast = useToast()
-const emailStore = useEmailStore()
 
 
 // socket.on("emailSent", data => {
@@ -156,7 +154,7 @@ socket.on("notifSAT", data => {
 
 // ✅ Event "revoked" sekarang menangani status "Revoked" secara terpisah
 socket.on("revoked", data => {
-  console.log("📩 Received 'revoked' event:", data)
+  console.log("📩 Received 'revoked' event:", JSON.stringify(data, null, 2))
 
   if (!userData) {
     console.warn("⚠️ User data tidak tersedia.")
@@ -165,49 +163,58 @@ socket.on("revoked", data => {
   }
 
   // 🔍 Cek apakah user berhak mendapatkan notifikasi
+  console.log("🕵️‍♂️ Memeriksa apakah user memiliki akses...")
+  console.log("data.job_order?.created_by:", data.job_order?.created_by)
+  console.log("userData.id:", userData?.id)
+  console.log("ability.can('Posting', 'BOA SAT Task'):", ability.can("Posting", "BOA SAT Task"))
+
   if (
     data.job_order?.created_by === userData.id ||
     ability.can("Posting", "BOA SAT Task")
   ) {
-    console.log("✅ User berhak menerima notifikasi SAT Revoked.")
+    try {
+      console.log("✅ User berhak menerima notifikasi SAT Revoked.")
 
-    const toast = useToast()
+      const toast = useToast()
 
-    toast.info("SAT REVOKED", { timeout: 20000, toastClassName: 'toast-notification' })
+      toast.info("SAT REVOKED", { timeout: 20000, toastClassName: 'toast-notification' })
 
+      // 🚀 Data yang dikirim ke backend (jika perlu)
+      let postData = {
+        sat_number: data?.document_number,
+        jo_number: data?.bill_number,
+        job_order_task_id: data?.id,
+        note_sat: data?.job_order_task?.note,
+        created_by_sat: data?.created_by,
+        processed_by_sat: data?.processed?.person?.name,
+        status_sat: data?.status_name,
+      }
 
-    // 🚀 Data yang dikirim ke backend (jika perlu)
-    let postData = {
-      sat_number: data?.document_number,
-      jo_number: data?.bill_number,
-      job_order_task_id: data?.id,
-      note_sat: data?.job_order_task?.note,
-      created_by_sat: data?.created_by,
-      processed_by_sat: data?.processed?.person?.name,
-      status_sat: data?.status_name,
+      console.log("🔄 Mengirim data ke backend:", JSON.stringify(postData, null, 2))
+
+      axiosIns.post("/notifications", postData)
+        .then(response => {
+          console.log("✅ Data berhasil dikirim:", response.data)
+          notificationsStore.notifTrigger++
+        })
+        .catch(error => {
+          console.error("❌ Gagal mengirim data:", error.response?.data || error.message)
+        })
+
+      // 📩 Tambahkan ke store notifikasi
+      let notifData = {
+        id: data.id,
+        from: data?.processed?.person?.name,
+        NomerSat: data?.document_number,
+        created_at: data?.updated_at,
+        message: data?.status_name,
+      }
+
+      console.log("📩 Menambahkan notifikasi ke store:", JSON.stringify(notifData, null, 2))
+      notificationsStore.addNotifSAT(notifData)
+    } catch (err) {
+      console.error("🔥 Error sebelum mengirim data:", err)
     }
-
-    console.log("🔄 Mengirim data ke backend:", postData)
-    axiosIns.post("/notifications", postData)
-      .then(response => {
-        console.log("✅ Data berhasil dikirim:", response.data)
-        notificationsStore.notifTrigger++
-      })
-      .catch(error => {
-        console.error("❌ Gagal mengirim data:", error.response?.data || error.message)
-      })
-
-    // 📩 Tambahkan ke store notifikasi
-    let notifData = {
-      id: data.id, 
-      from: data?.processed?.person?.name,
-      NomerSat: data?.document_number,
-      created_at: data?.updated_at, 
-      message: data?.status_name,
-    }
-
-    console.log("📩 Menambahkan notifikasi ke store:", notifData)
-    notificationsStore.addNotifSAT(notifData)
   } else {
     console.warn("⚠️ Syarat tidak terpenuhi, notifikasi tidak ditampilkan.")
   }
