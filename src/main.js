@@ -99,31 +99,41 @@ const toast = useToast()
 //     status: 0,
 //   })
 // })
-// 🔥 Event "notifSAT" hanya menangani status "Rejected"
 socket.on("notifSAT", data => {
   console.log("🔍 processed_by_sat:", data?.processed_by)
 
-  // Periksa apakah status adalah "Rejected" dan user memiliki akses
+
   if (
     userData && 
-    data.status_name === "Rejected" && 
+    (data.status_name === "Revoked" || (data.job_order?.created_by === userData.id)) && 
     ability.can('Posting', 'BOA SAT Task')
   ) {
-    console.log("✅ Status 'Rejected' terdeteksi, menjalankan proses...")
+    console.log("✅ Syarat terpenuhi, menjalankan proses...")
 
     const toast = useToast()
+    let toastMessage = data.status_name === "Revoked" ? "SAT REVOKED" : "SAT REJECTED"
 
-    toast.info("SAT REJECTED", { timeout: 20000, toastClassName: 'toast-notification' })
+    toast.info(toastMessage, { timeout: 20000, toastClassName: 'toast-notification' })
 
-    let postData = {
-      sat_number: data?.job_order?.document_number,
-      jo_number: data?.job_order?.bill_number,
-      job_order_task_id: data?.job_order_task?.id,
-      note_sat: data?.note,
-      created_by_sat: data?.job_order?.created_by,
-      processed_by_sat: data?.processed?.person?.name,
-      status_sat: data?.status_name,
-    }
+    let postData = data.status_name === "Revoked"
+      ? {
+        sat_number: data?.document_number,
+        jo_number: data?.bill_number,
+        job_order_task_id: data?.id,
+        note_sat: data?.job_order_task?.note,
+        created_by_sat: data?.created_by,
+        processed_by_sat: data?.processed?.person?.name,
+        status_sat: data?.status_name,
+      }
+      : {
+        sat_number: data?.job_order?.document_number,
+        jo_number: data?.job_order?.bill_number,
+        job_order_task_id: data?.job_order_task?.id,
+        note_sat: data?.note,
+        created_by_sat: data?.job_order?.created_by,
+        processed_by_sat: data?.processed?.person?.name,
+        status_sat: data?.status_name,
+      }
 
     console.log("🔄 Mengirim data ke server:", postData)
 
@@ -136,90 +146,30 @@ socket.on("notifSAT", data => {
         console.error("❌ Gagal mengirim data:", error.response?.data || error.message)
       })
 
-    let notifData = {
-      id: data.id, 
-      from: data?.processed?.person?.name,
-      NomerSat: data?.job_order?.document_number,
-      created_at: data.updated_at, 
-      message: data.status_name,
-    }
+    let notifData = data.status_name === "Revoked"
+      ? {
+        id: data.id, 
+        from: data?.processed?.person?.name,
+        NomerSat: data?.document_number,
+        created_at: data?.updated_at, 
+        message: data?.status_name,
+      }
+      : {
+        id: data.id, 
+        from: data?.processed?.person?.name,
+        NomerSat: data?.job_order?.document_number,
+        created_at: data.updated_at, 
+        message: data.status_name,
+      }
 
     console.log("📩 Menambahkan notifikasi ke store:", notifData)
     
     notificationsStore.addNotifSAT(notifData)
+
   } else {
     console.warn("⚠️ Syarat tidak terpenuhi, toast tidak ditampilkan.")
   }
 })
-
-// ✅ Event "revoked" sekarang menangani status "Revoked" secara terpisah
-socket.on("revoked", data => {
-  console.log("📩 Received 'revoked' event:", JSON.stringify(data, null, 2))
-
-  if (!userData) {
-    console.warn("⚠️ User data tidak tersedia.")
-    
-    return
-  }
-
-  // 🔍 Cek apakah user berhak mendapatkan notifikasi
-  console.log("🕵️‍♂️ Memeriksa apakah user memiliki akses...")
-  console.log("data.job_order?.created_by:", data.job_order?.created_by)
-  console.log("userData.id:", userData?.id)
-  console.log("ability.can('Posting', 'BOA SAT Task'):", ability.can("Posting", "BOA SAT Task"))
-
-  if (
-    data.job_order?.created_by === userData.id ||
-    ability.can("Posting", "BOA SAT Task")
-  ) {
-    try {
-      console.log("✅ User berhak menerima notifikasi SAT Revoked.")
-
-      const toast = useToast()
-
-      toast.info("SAT REVOKED", { timeout: 20000, toastClassName: 'toast-notification' })
-
-      // 🚀 Data yang dikirim ke backend (jika perlu)
-      let postData = {
-        sat_number: data?.document_number,
-        jo_number: data?.bill_number,
-        job_order_task_id: data?.id,
-        note_sat: data?.job_order_task?.note,
-        created_by_sat: data?.created_by,
-        processed_by_sat: data?.processed?.person?.name,
-        status_sat: data?.status_name,
-      }
-
-      console.log("🔄 Mengirim data ke backend:", JSON.stringify(postData, null, 2))
-
-      axiosIns.post("/notifications", postData)
-        .then(response => {
-          console.log("✅ Data berhasil dikirim:", response.data)
-          notificationsStore.notifTrigger++
-        })
-        .catch(error => {
-          console.error("❌ Gagal mengirim data:", error.response?.data || error.message)
-        })
-
-      // 📩 Tambahkan ke store notifikasi
-      let notifData = {
-        id: data.id,
-        from: data?.processed?.person?.name,
-        NomerSat: data?.document_number,
-        created_at: data?.updated_at,
-        message: data?.status_name,
-      }
-
-      console.log("📩 Menambahkan notifikasi ke store:", JSON.stringify(notifData, null, 2))
-      notificationsStore.addNotifSAT(notifData)
-    } catch (err) {
-      console.error("🔥 Error sebelum mengirim data:", err)
-    }
-  } else {
-    console.warn("⚠️ Syarat tidak terpenuhi, notifikasi tidak ditampilkan.")
-  }
-})
-
 
 // Listen for Pusher events
 window.Echo.channel('tickets')
