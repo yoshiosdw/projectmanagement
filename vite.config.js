@@ -100,5 +100,5 @@ export default defineConfig({
       './src/**/*.vue',
     ],
   },
-  base: "/sinarjo/",
+  base: "/sinarjoyoboyo/",
 })
