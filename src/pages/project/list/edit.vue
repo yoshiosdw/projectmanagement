@@ -12,6 +12,7 @@ import { getCurrentDateTimeWIB, formatDateTimeMySql } from '@/@core/utils/format
 import Person from '@/pages/lookup/employeeICT.vue'
 import Team from '@/pages/lookup/lookupTeamProject.vue'
 import Ticket from '@/pages/lookup/ticket.vue'
+import ToolTip from './priorityTask.vue'
 
 const props = defineProps({
   headerId: {
@@ -162,6 +163,7 @@ const fetchProjectId = async headerId => {
     ticketNumber.value = projectLineData.value.ticket?.document_number
     ticketDescription.value = projectLineData.value.ticket?.description
     ticketRequestor.value = projectLineData.value.ticket?.user.person.name
+    ticketIdOld.value = projectLineData.value.ticket_id
     person.value = projectLineData.value.requestor?.person?.name
 
     teamName.value = projectLineData.value.team?.description || ''
@@ -241,8 +243,10 @@ const editProject = async (id) => {
     formData.append('project_department_id', department.value.id || departmentOldId.value || '');
     formData.append('project_team_id', teamId.value || teamOldId.value || '');
     formData.append('biu_id', biu.value.id || biuOldId.value || '');
-    formData.append('requestor_id', personId.value || '');
 
+    if (personId.value) {
+      formData.append('requestor_id', personId.value)
+    }
     if (attachFile.value) {
       formData.append('attachment', attachFile.value)
     }
@@ -305,6 +309,7 @@ const validateFom = ()=>{
 const handleFileChange = event => {
   attachFile.value = event.target.files[0]
 }
+provide("priorityTask", Projectpriority);
 </script>
 
 <template>
@@ -414,7 +419,8 @@ const handleFileChange = event => {
             
             
             <VRow>
-              <VCol cols="3">
+              <VCol cols="3"
+              class="d-flex gap-3">
                 <VAutocomplete
                   v-model="priority"
                   return-object
@@ -424,6 +430,7 @@ const handleFileChange = event => {
                   label="Priority"
                   :rules="[requiredValidator]"
                 />
+                <ToolTip />
               </VCol>
               <VCol
                 cols="9"
