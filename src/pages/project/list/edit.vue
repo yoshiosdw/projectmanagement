@@ -229,7 +229,6 @@ const editProject = async (id) => {
   showLoading.value = true;
   try {
     const allowedMimeTypes = ['application/pdf']
-
     const formData = new FormData();
 
     formData.append('name', name.value || '');

@@ -483,8 +483,11 @@ const statusOptions = [
                         </VListItem>
 
                         <VListItem
-                          v-if="(!data.target_end || !data.plan_start) && (data.status_name == 'First_level_approved' && data.person_in_charge_id) && ability.can('Manage','ICT Ticket')"
-                          :to="{name: 'ticket-assignto-id', params:{id:data.id}}"
+                          v-if="(!data.target_end || !data.plan_start) && (data.status_name == 'First_level_approved' && data.person_in_charge_id) && (ability.can('Manage', 'ICT Ticket') || ability.can('Manage', 'GA Ticket'))"
+                          :to="{
+                            name: ability.can('Manage', 'ICT Ticket') ? 'ticket-assignto-id' : 'ticket-ga-detail-id',
+                            params: { id: data.id }
+                          }"
                         >
                           <template #prepend>
                             <VIcon
@@ -497,26 +500,13 @@ const statusOptions = [
                           </template>
                           <VListItemTitle>Plan/Target Date</VListItemTitle>
                         </VListItem>
-                        
-                        <!--
-                          <VListItem
-                          @click="openDialog(data.id)"
-                          >
-                          <template #prepend>
-                          <VIcon
-                          variant="none"
-                          density="compact"
-                          class="custom-icon-color"
-                          size="24"
-                          icon="mdi-eye-outline"
-                          />
-                          </template>
-                          <VListItemTitle>View</VListItemTitle>
-                          </VListItem> 
-                        -->
+
                         <VListItem
-                          v-if="ability.can('Manage', 'ICT Ticket')"
-                          :to="{name: 'ticket-detail-id', params:{id:data.id}}"
+                          v-if="ability.can('Manage', 'ICT Ticket') || ability.can('Manage', 'GA Ticket')"
+                          :to="{
+                            name: ability.can('Manage', 'ICT Ticket') ? 'ticket-detail-id' : 'ticket-ga-detail-id',
+                            params: { id: data.id }
+                          }"
                         >
                           <template #prepend>
                             <VIcon
@@ -528,37 +518,7 @@ const statusOptions = [
                             />
                           </template>
                           <VListItemTitle>View</VListItemTitle>
-                        </VListItem>
-                        <VListItem
-                          v-if="(!data.target_end || !data.plan_start) && (data.status_name == 'First_level_approved' && data.person_in_charge_id) && ability.can('Manage','GA Ticket')" 
-                          :to="{name: 'ticket-ga-detail-id', params:{id:data.id}}"
-                        >
-                          <template #prepend>
-                            <VIcon
-                              variant="none"
-                              density="compact"
-                              class="custom-icon-color"
-                              size="24"
-                              icon="mdi-eye-outline"
-                            />
-                          </template>
-                          <VListItemTitle>Plan/Target Date</VListItemTitle>
-                        </VListItem>
-                        <VListItem
-                          v-if="ability.can('Manage','GA Ticket')"
-                          :to="{name: 'ticket-ga-detail-id', params:{id:data.id}}"
-                        >
-                          <template #prepend>
-                            <VIcon
-                              variant="none"
-                              density="compact"
-                              class="custom-icon-color"
-                              size="24"
-                              icon="mdi-eye-outline"
-                            />
-                          </template>
-                          <VListItemTitle>View</VListItemTitle>
-                        </VListItem>      
+                        </VListItem> 
                         
                         <VListItem
                           v-if="data.status_name === 'First_level_approved' && (data.plan_start && data.target_end)"
