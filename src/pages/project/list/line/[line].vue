@@ -8,6 +8,7 @@ import { useRoute } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import AddLine from './addLine.vue'
 import Edit from './edit.vue'
+import Ended from '../endProject.vue'
 
 // import Person from '@/pages/ticket/person.vue'
 
@@ -57,6 +58,7 @@ const planEndLine = ref()
 const ActualStartLine = ref()
 const ActualEndLine = ref()
 
+const notes = ref()
 
 const statusLine = ref()
 const priorityLine = ref()
@@ -147,6 +149,7 @@ const fetchProjectLine = async (projectId, page, perPage, find) => {
     planEndLine.value = projectLine.value?.plan_end || ''
     ActualStartLine.value = projectLine.value?.actual_start || ''
     ActualEndLine.value = projectLine.value?.actual_end || ''
+    notes.value = projectLine.value?.note || ''
 
     total.value = ret.data.meta.total
     last.value = ret.data.meta.last
@@ -355,16 +358,18 @@ const btnStartHandler = id => {
   })
 }
 
-const endProject = async id => {
+const endProject = async (id, note) => {
   showLoading.value = true
-
+  
   try {
-    const ret = await axiosIns.post(`/project/line/execution/done/${id}` )
+    const ret = await axiosIns.patch(`/project/line/execution/done/${id}`, 
+    {
+      note: note
+    })
 
     fetchProjectLine(projectId.value, page.value, perPage.value, find.value)
 
     showLoading.value = false
-
   } catch(error) {
     Swal.fire({
       title: 'LBG',
@@ -380,13 +385,20 @@ const btnEndHandler = id => {
     title: 'LBG',
     text: 'Sure Ended Project Now?',
     icon: 'question',
+    input: 'textarea', 
+    inputAttributes: {
+      style: 'height: 60px;'
+    },
+    inputPlaceholder: 'Enter a note (optional)...',
     showCancelButton: true,
     confirmButtonColor: '#C51605',
     cancelButtonColor: 'default',
     confirmButtonText: 'Yes, End Now!',
+    cancelButtonText: 'Cancel',
   }).then(ret => {
     if(ret.isConfirmed) {
-      endProject(id)
+      const note = ret.value || '';
+      endProject(id, note);
     }
   })
 }
@@ -670,6 +682,12 @@ const btnHoldHandler = id => {
                   scope="col"
                   class="text-no-wrap"
                 >
+                  Note
+                </th>
+                <th
+                  scope="col"
+                  class="text-no-wrap"
+                >
                   Actual Duration (Day)
                 </th>
               </tr>
@@ -743,6 +761,9 @@ const btnHoldHandler = id => {
                             v-if="data.status === 1 || data.status === 9"
                             @click="btnEndHandler(data.id)"
                           >
+                          <!--
+                            <Ended :project-id="data.id" @refresh="fetchProjectLine(projectId, page, perPage, find)"/>
+                            --> 
                             <VListItemTitle>
                               <VIcon
                                 variant="none"
@@ -807,7 +828,7 @@ const btnHoldHandler = id => {
                     />
                   </div>
                 </td>
-                <td class="text-no-wrap">
+                <td style="white-space: normal; overflow-wrap: break-word; min-width: 500px;">
                   {{ data.description }}
                 </td>
                 <td class="text-no-wrap">
@@ -827,6 +848,9 @@ const btnHoldHandler = id => {
                 </td>
                 <td class="text-no-wrap">
                   {{ data.actual_end }}
+                </td>
+                <td style="white-space: normal; overflow-wrap: break-word; min-width: 500px;">
+                  {{ data.note }}
                 </td>
                 <td style="text-align: right;">
                   {{ data.actual_duration }}
