@@ -6,6 +6,7 @@ import { useToast } from 'vue-toastification'
 import router from '@/router'
 import { requiredValidator } from '@/@core/utils/validators'
 import Line from './line/[line].vue'
+import ToolTip from './priorityTask.vue'
 
 
 
@@ -312,6 +313,7 @@ const validateFom = ()=>{
     }
   })
 }
+provide("priorityTask", Projectpriority);
 </script>
 
 <template>
@@ -438,6 +440,9 @@ const validateFom = ()=>{
                   label="Priority"
                   :rules="[requiredValidator]"
                 />
+                <!--
+                  <ToolTip/>
+                -->
               </VCol>
               <VCol
                 cols="9"
