@@ -477,6 +477,7 @@ provide("priorityTask", Projectpriority);
                 <VTextField 
                   v-model="attachName"
                   label="Existing Attched File"
+                  variant="filled"
                   readonly
                 />
               </VCol>
