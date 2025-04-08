@@ -233,7 +233,7 @@ const editProject = async (id) => {
 
     formData.append('name', name.value || '');
     formData.append('description', description.value || '');
-    formData.append('priority_id', priority.value.code || priorityOldId.value || '');
+    formData.append('priority_id', priority.value.code ?? priorityOldId.value ?? '');
     formData.append('plan_start', formatDateTimeMySql(planStart.value) || '');
     formData.append('plan_end', formatDateTimeMySql(planEnd.value) || '');
     formData.append('actual_start', ActualStart.value || '');
@@ -477,6 +477,7 @@ provide("priorityTask", Projectpriority);
                 <VTextField 
                   v-model="attachName"
                   label="Existing Attched File"
+                  variant="filled"
                   readonly
                 />
               </VCol>
