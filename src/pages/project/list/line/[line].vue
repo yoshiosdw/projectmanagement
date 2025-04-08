@@ -8,7 +8,7 @@ import { useRoute } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import AddLine from './addLine.vue'
 import Edit from './edit.vue'
-import Ended from '../endProject.vue'
+import ability from '@/plugins/casl/ability'
 
 // import Person from '@/pages/ticket/person.vue'
 
@@ -18,6 +18,9 @@ const props = defineProps({
     required: true,
   },
 })
+
+const userData = JSON.parse(localStorage.getItem('sinarjoUserData'))
+const userId = userData ? userData.id : null
 
 const emit = defineEmits(['saved'])
 const route = useRoute()
@@ -439,6 +442,46 @@ const btnHoldHandler = id => {
     }
   })
 }
+
+const btnDeleteDisabled = (data) => {
+  if (data.status === 2) {
+    return true
+  }
+
+  if (data.status === 1) {
+    return true
+  }
+
+  const hasProjectPermission = userData?.ability?.some(perm => perm.action === 'Manage' && perm.subject === 'Project')
+
+  if (!hasProjectPermission) {
+    return true
+  }
+}
+
+const btnEditDisabled = (data) => {
+  if (data.status === 2) {
+    return true
+  }
+
+  const hasProjectPermission = userData?.ability?.some(perm => perm.action === 'Manage' && perm.subject === 'Project')
+
+  if (!hasProjectPermission) {
+    return true
+  }
+}
+
+const btnEndDisabled = (data) => {
+  if (data.status === 2) {
+    return true
+  }
+
+  const hasProjectPermission = userData?.ability?.some(perm => perm.action === 'Manage' && perm.subject === 'Project')
+
+  if (data?.assign_to?.person?.user?.id !== userId && !hasProjectPermission) {
+    return true
+  }
+}
 </script>
 
 <template>
@@ -706,8 +749,8 @@ const btnHoldHandler = id => {
                       color="warning"
                       title="Edit"
                       size="22"
-                      :disabled="data.status === 2"
                       @click="editLine(data.id)"
+                      :disabled="btnEditDisabled(data)"
                     >
                       <VIcon
                         icon="tabler-edit"
@@ -719,8 +762,8 @@ const btnHoldHandler = id => {
                       color="error"
                       title="Delete"
                       size="22"
-                      :disabled="data.status === 2 || data.status === 1"
                       @click="btnDeleteClickHandler(data.id)"
+                      :disabled="btnDeleteDisabled (data)"
                     >
                       <VIcon
                         icon="tabler-trash"
@@ -733,7 +776,7 @@ const btnHoldHandler = id => {
                       color="default"
                       size="22"
                       title="View More"
-                      :disabled="data.status === 2"
+                      :disabled="btnEndDisabled(data)"
                     >
                       <VIcon
                         :size="22"
@@ -780,7 +823,7 @@ const btnHoldHandler = id => {
                           <VDivider />
 
                           <VListItem
-                            v-if="data.status !== 3"
+                            v-if="data.status !== 3 && ability.can('Manage', 'Project')"
                             @click="btnHoldHandler(data.id)"
                           >
                             <VListItemTitle>
