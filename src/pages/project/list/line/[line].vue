@@ -390,11 +390,11 @@ const btnEndHandler = id => {
     title: 'LBG',
     text: 'Sure Ended Project Now?',
     icon: 'question',
-    input: 'textarea', 
-    inputAttributes: {
-      style: 'height: 60px;'
-    },
-    inputPlaceholder: 'Enter a note (optional)...',
+    // input: 'textarea', 
+    // inputAttributes: {
+    //   style: 'height: 60px;'
+    // },
+    // inputPlaceholder: 'Enter a note (optional)...',
     showCancelButton: true,
     confirmButtonColor: '#C51605',
     cancelButtonColor: 'default',
@@ -585,12 +585,14 @@ const btnEndDisabled = (data) => {
                   readonly
                   :rules="[requiredValidator]"
                 />
-                <VTextField
-                  v-model="attachment"
-                  label="Attachment"
-                  variant="filled"
-                  readonly
-                />
+                <!--
+                  <VTextField
+                    v-model="attachment"
+                    label="Attachment"
+                    variant="filled"
+                    readonly
+                  />
+                  -->
               </VCol>
             </VRow>
             <VRow>
@@ -727,12 +729,14 @@ const btnEndDisabled = (data) => {
                 >
                   Actual End
                 </th>
-                <th
-                  scope="col"
-                  class="text-no-wrap"
-                >
-                  Note
-                </th>
+                <!--
+                  <th
+                    scope="col"
+                    class="text-no-wrap"
+                  >
+                    Note
+                  </th>
+                  -->
                 <th
                   scope="col"
                   class="text-no-wrap"
@@ -899,9 +903,11 @@ const btnEndDisabled = (data) => {
                 <td class="text-no-wrap">
                   {{ data.actual_end }}
                 </td>
-                <td style="white-space: normal; overflow-wrap: break-word; min-width: 500px;">
-                  {{ data.note }}
-                </td>
+                <!--
+                  <td style="white-space: normal; overflow-wrap: break-word; min-width: 500px;">
+                    {{ data.note }}
+                  </td>
+                  -->
                 <td style="text-align: right;">
                   {{ data.actual_duration }}
                 </td>
