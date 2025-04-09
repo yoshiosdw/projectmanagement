@@ -19,6 +19,7 @@ const props = defineProps({
   },
 })
 
+// Ambil data user yang login dan simpan id nya dalam userId. 
 const userData = JSON.parse(localStorage.getItem('sinarjoUserData'))
 const userId = userData ? userData.id : null
 
@@ -443,7 +444,9 @@ const btnHoldHandler = id => {
   })
 }
 
+// Function ini digunakan untuk mengolah logika.  
 const btnDeleteDisabled = (data) => {
+  //Kalau status nya 1 dan 2 maka disabled nya jadi true
   if (data.status === 2) {
     return true
   }
@@ -452,6 +455,7 @@ const btnDeleteDisabled = (data) => {
     return true
   }
 
+  // Kalau user tidak punya permission maka disabled nya jadi true. Berlaku untuk button edit dan delete di project line
   const hasProjectPermission = userData?.ability?.some(perm => perm.action === 'Manage' && perm.subject === 'Project')
 
   if (!hasProjectPermission) {
@@ -471,6 +475,7 @@ const btnEditDisabled = (data) => {
   }
 }
 
+//Ini juga sama, hanya saja ada tambahan. Kalau user tidak memiliki permission dan assign to nya tidak sama dengan user yang login maka disabled nya jadi true
 const btnEndDisabled = (data) => {
   if (data.status === 2) {
     return true
@@ -743,6 +748,7 @@ const btnEndDisabled = (data) => {
               >
                 <td style="width: 5rem;">
                   <div class="d-flex justify-start">
+                  <!-- Penerapan functionnya seperti ini -->
                     <VBtn
                       icon
                       variant="none"
