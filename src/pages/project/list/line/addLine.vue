@@ -2,14 +2,14 @@
 import DialogCloseBtn from '@/@core/components/DialogCloseBtn.vue'
 import { requiredValidator } from '@/@core/utils/validators'
 import axiosIns from '@/plugins/axios'
-import { watchEffect } from 'vue'
+import { provide, watchEffect } from 'vue'
 import { useToast } from 'vue-toastification'
 
 // import Person from '@/pages/ticket/person.vue'
 // import Person from '@/pages/lookup/employee.vue'
 import Person from '@/pages/lookup/employeeByTeam.vue'
 import { formatDateTimeMySql, getCurrentDateTimeWIB } from '@/@core/utils/formatters'
-
+import ToolTip from '../priorityTask.vue'
 
 const props = defineProps({
   headerId: {
@@ -172,6 +172,7 @@ const validateFom = ()=>{
     }
   })
 }
+provide("priorityTask", Projectpriority);
 </script>
 
 <template>
@@ -226,6 +227,9 @@ const validateFom = ()=>{
                 :rules="[requiredValidator]"
               />
             </VCol>
+            <!-- <VCol cols="auto" class="d-flex align-center justify-center px-0">
+                <ToolTip />
+            </VCol> -->
             <VCol
               cols="4"
               class="d-flex gap-3"
