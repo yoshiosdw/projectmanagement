@@ -323,7 +323,7 @@ provide("priorityTask", Projectpriority);
       <DialogCloseBtn @click="closeDialog" />
       <VOverlay v-model="showLoading" />
       <VCard :loading="showLoading">
-        <VCardTitle>Add Project</VCardTitle>
+        <VCardTitle>Edit Project</VCardTitle>
         <VDivider />
   
         <VCardText>
