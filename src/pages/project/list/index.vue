@@ -835,7 +835,7 @@ const resolveAttachVariant = attachment => {
                   {{ data.name || '' }}
                 </td>
                
-                <td style="white-space: nowrap;">
+                <td style="white-space: normal; overflow-wrap: break-word; min-width: 500px;">
                   {{ data.description }}
                 </td>
 
