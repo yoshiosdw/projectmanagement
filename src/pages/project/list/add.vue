@@ -410,9 +410,9 @@ provide("priorityTask", Projectpriority);
                   variant="filled"
                   readonly
                 />
-                <Person
+                <!-- <Person
                 v-if="!ticketTransferId && !displayTicketDocNo"
-                 @employee="getPerson" />
+                 @employee="getPerson" /> -->
               </VCol>
             </VRow>
 
@@ -444,6 +444,9 @@ provide("priorityTask", Projectpriority);
                   <ToolTip/>
                 -->
               </VCol>
+              <!-- <VCol cols="auto" class="d-flex align-center justify-center px-0">
+                <ToolTip />
+              </VCol> -->
               <VCol
                 cols="9"
                 class="d-flex gap-3"
@@ -486,7 +489,7 @@ provide("priorityTask", Projectpriority);
                   @click="openDatePicker"
                 />
               </VCol>
-              <VCol cols="4">
+              <!-- <VCol cols="4">
                 <VFileInput 
                 label="Attach file" 
                 v-model="attachment" 
@@ -494,7 +497,7 @@ provide("priorityTask", Projectpriority);
                 accept=".pdf"
                 density="comfortable"
                 />
-            </VCol>
+            </VCol> -->
             </VRow>
             <VRow class="mt-3">
               <VCol
