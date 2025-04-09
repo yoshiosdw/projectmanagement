@@ -219,7 +219,7 @@ const endProject = async id => {
   showLoading.value = true
 
   try {
-    const ret = await axiosIns.post(`/projects/execution/done/${id}` )
+    const ret = await axiosIns.patch(`/projects/execution/done/${id}` )
 
     fetchProject(projectStore.page, projectStore.perPage, find.value),
 
@@ -656,12 +656,14 @@ const resolveAttachVariant = attachment => {
                 >
                   Actual Duration (Day)
                 </th>
-                <th
-                  scope="col"
-                  class="text-no-wrap"
-                >
-                  Attachment
-                </th>
+                <!--
+                  <th
+                    scope="col"
+                    class="text-no-wrap"
+                  >
+                    Attachment
+                  </th>
+                  -->
               </tr>
             </thead>
             <tbody>
@@ -831,7 +833,7 @@ const resolveAttachVariant = attachment => {
                   </VChip>
                 </td>
 
-                <td>
+                <td style="white-space: normal; overflow-wrap: break-word; min-width: 300px;">
                   {{ data.name || '' }}
                 </td>
                
@@ -872,26 +874,28 @@ const resolveAttachVariant = attachment => {
                 <td style="text-align: right;">
                   {{ data.actual_duration }}
                 </td>
-                <td
-                  style="word-wrap: break-word;"
-                  class="text-wrap"
-                >
-                  <div
-                    class="d-flex flex-column text-wrap"
-                    >
-                    <VChip 
-                    v-if="data.attachment !== null"
-                    :color="resolveAttachVariant(data.attachment).color"
-                    size="small"
-                    @click="downloadFile(data.attachment)"
-                    >
-                      {{ truncateText(data.attachment) }}
-                    </VChip>
-                    <template v-else>
-                      {{ data.attachment }}
-                    </template>
-                  </div>
-                </td>
+                <!--
+                  <td
+                    style="word-wrap: break-word;"
+                    class="text-wrap"
+                  >
+                    <div
+                      class="d-flex flex-column text-wrap"
+                      >
+                      <VChip 
+                      v-if="data.attachment !== null"
+                      :color="resolveAttachVariant(data.attachment).color"
+                      size="small"
+                      @click="downloadFile(data.attachment)"
+                      >
+                        {{ truncateText(data.attachment) }}
+                      </VChip>
+                      <template v-else>
+                        {{ data.attachment }}
+                      </template>
+                    </div>
+                  </td>
+                  -->
               </tr>
             </tbody>
           </VTable>
