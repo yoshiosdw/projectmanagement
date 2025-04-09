@@ -42,7 +42,7 @@ const projectPriority = inject("priorityTask");
         </VCardText>
         <VCardActions>
         <VSpacer class="mt-2"/>
-        <VBtn color="primary" @click="isOpen = false">Tutup</VBtn>
+        <VBtn color="primary" @click="isOpen = false">Close</VBtn>
         </VCardActions>
     </VCard>
     </VDialog>
