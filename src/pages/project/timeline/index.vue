@@ -160,27 +160,51 @@ const renderGanttChart = async () => {
 
       try {
         if (isHeader) {
-          const response = await axiosIns.post(`/projects/${cleanId}`, {
+          await axiosIns.post(`/projects/${cleanId}`, {
             plan_start: formatDateMySql(start),
             plan_end: formatDateMySql(end),
           })
 
-          console.log('Project updated:', response.data)
+          toast.success(`Updated: ${task.name}`)
         } else if (isLine) {
-          const response = await axiosIns.patch(`/project/line/${cleanId}`, {
+          await axiosIns.patch(`/project/line/${cleanId}`, {
             plan_start: formatDateMySql(start),
             plan_end: formatDateMySql(end),
           })
 
-          console.log('Line updated:', response.data)
+          // Cari header yang memiliki line ini
+          const affectedHeader = headers.value.find(header =>
+            Array.isArray(header.line) &&
+        header.line.some(line => line.id == cleanId),
+          )
+
+          if (affectedHeader) {
+            const movedLineEnd = new Date(end)
+            const headerEnd = new Date(affectedHeader.plan_end)
+
+            if (movedLineEnd > headerEnd) {
+              // Hanya update jika line.plan_end lebih besar dari header.plan_end
+              await axiosIns.post(`/projects/${affectedHeader.id}`, {
+                plan_start: affectedHeader.plan_start,
+                plan_end: formatDateMySql(movedLineEnd),
+              })
+
+              toast.success(`Header updated: ${affectedHeader.name}`)
+            }
+          }
+
+          toast.success(`Updated: ${task.name}`)
         }
 
-        toast.success(`Updated: ${task.name}`)
+        // Fetch ulang data dan render ulang Gantt
+        await fetchProject()
+        renderGanttChart()
       } catch (err) {
         console.error('Failed to update:', err)
         toast.error(`Failed to update ${task.name}`)
       }
     },
+
 
   })
   
