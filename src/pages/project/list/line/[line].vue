@@ -368,9 +368,8 @@ const endProject = async (id, note) => {
   try {
 
     const ret = await axiosIns.patch(`/project/line/execution/done/${id}`, 
-    {
-      note: note
-    })
+    // {note: note}
+    )
 
     fetchProjectLine(projectId.value, page.value, perPage.value, find.value)
 
@@ -402,8 +401,8 @@ const btnEndHandler = id => {
     cancelButtonText: 'Cancel',
   }).then(ret => {
     if(ret.isConfirmed) {
-      const note = ret.value || '';
-      endProject(id, note);
+      // const note = ret.value || '';
+      endProject(id);
     }
   })
 }
