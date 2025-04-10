@@ -439,8 +439,8 @@ const validateAndApprove = () => {
                   v-model="plantStart"
                   label="Plan Start"
                   type="datetime-local"
-                  :rules="[requiredValidator]"
-                  density="comfortable"
+                  density="compact"
+                  prepend-inner-icon=""
                   variant="outlined"
                   class="custom-date-field"
                   @click="openDatePicker"
@@ -451,8 +451,7 @@ const validateAndApprove = () => {
                   v-model="endTarget"
                   label="Plan End"
                   type="datetime-local"
-                  :rules="[requiredValidator]"
-                  density="comfortable"
+                  density="compact"
                   variant="outlined"
                   class="custom-date-field"
                   @click="openDatePicker"
@@ -552,7 +551,13 @@ const validateAndApprove = () => {
   </VRow>
 </template>
 
-
+<style>
+/* Menyembunyikan ikon kalender bawaan */
+.custom-date-field input::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+}
+</style>
 
 <route lang="yaml">
   meta:
