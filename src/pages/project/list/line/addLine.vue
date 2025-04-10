@@ -217,7 +217,7 @@ provide("priorityTask", Projectpriority);
                 @employee="getApprovalPerson"
               />
             </VCol>
-            <VCol cols="4">
+            <VCol>
               <VAutocomplete
                 v-model="priorityLine"
                 item-value="code"
@@ -227,9 +227,9 @@ provide("priorityTask", Projectpriority);
                 :rules="[requiredValidator]"
               />
             </VCol>
-            <!-- <VCol cols="auto" class="d-flex align-center justify-center px-0">
+            <VCol cols="auto" class="d-flex align-center justify-center px-0">
                 <ToolTip />
-            </VCol> -->
+            </VCol>
             <VCol
               cols="4"
               class="d-flex gap-3"
