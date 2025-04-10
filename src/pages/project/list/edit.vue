@@ -398,9 +398,9 @@ provide("priorityTask", Projectpriority);
                   variant="filled"
                   readonly
                 />
-                <!-- <Person
+                <Person
                  v-if="!ticketNumber"
-                 @employee="getApprovalPerson" /> -->
+                 @employee="getApprovalPerson" />
               </VCol>
             </VRow>
 
@@ -418,7 +418,7 @@ provide("priorityTask", Projectpriority);
             
             
             <VRow>
-              <VCol cols="3"
+              <VCol
               class="d-flex gap-3">
                 <VAutocomplete
                   v-model="priority"
@@ -429,7 +429,9 @@ provide("priorityTask", Projectpriority);
                   label="Priority"
                   :rules="[requiredValidator]"
                 />
-                <!-- <ToolTip /> -->
+              </VCol>
+              <VCol cols="auto" class="d-flex align-center justify-center px-0">
+                <ToolTip />
               </VCol>
               <VCol
                 cols="9"
@@ -473,7 +475,7 @@ provide("priorityTask", Projectpriority);
                   @click="openDatePicker"
                 />
               </VCol>
-              <!-- <VCol cols="6">
+              <VCol cols="6">
                 <VTextField 
                   v-model="attachName"
                   label="Existing Attched File"
@@ -489,7 +491,7 @@ provide("priorityTask", Projectpriority);
                 accept=".pdf"
                 density="comfortable"
                 />
-            </VCol> -->
+            </VCol>
             </VRow>
             <VRow class="mt-3">
               <VCol
