@@ -215,11 +215,15 @@ const btnStartHandler = id => {
   })
 }
 
-const endProject = async id => {
+const endProject = async (id, note) => {
   showLoading.value = true
 
   try {
-    const ret = await axiosIns.patch(`/projects/execution/done/${id}` )
+    const payload = {}
+    if (note) {
+      payload.note = note
+    }
+    const ret = await axiosIns.patch(`/projects/execution/done/${id}`, payload)
 
     fetchProject(projectStore.page, projectStore.perPage, find.value),
 
@@ -240,13 +244,19 @@ const btnEndHandler = id => {
     title: 'LBG',
     text: 'Sure Ended Project Now?',
     icon: 'question',
+    input: 'textarea',
+    inputAttributes: {
+      style: 'height: 60px;'
+    },
+    inputPlaceholder: 'Enter a note (optional)...',
     showCancelButton: true,
     confirmButtonColor: '#C51605',
     cancelButtonColor: 'default',
     confirmButtonText: 'Yes, End Now!',
   }).then(ret => {
     if(ret.isConfirmed) {
-      endProject(id)
+      const note = ret.value ?? '';
+      endProject(id, note);
     }
   })
 }
@@ -656,14 +666,18 @@ const resolveAttachVariant = attachment => {
                 >
                   Actual Duration (Day)
                 </th>
-                <!--
                   <th
                     scope="col"
                     class="text-no-wrap"
                   >
                     Attachment
                   </th>
-                  -->
+                  <th
+                    scope="col"
+                    class="text-no-wrap"
+                  >
+                    Note
+                  </th>
               </tr>
             </thead>
             <tbody>
@@ -874,7 +888,6 @@ const resolveAttachVariant = attachment => {
                 <td style="text-align: right;">
                   {{ data.actual_duration }}
                 </td>
-                <!--
                   <td
                     style="word-wrap: break-word;"
                     class="text-wrap"
@@ -895,7 +908,9 @@ const resolveAttachVariant = attachment => {
                       </template>
                     </div>
                   </td>
-                  -->
+                <td style="white-space: normal; overflow-wrap: break-word; min-width: 300px;">
+                  {{ data.note }}
+                </td>
               </tr>
             </tbody>
           </VTable>
