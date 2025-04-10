@@ -8,7 +8,7 @@ export default [
   {
     title: 'Project Management',
     icon: { icon: 'tabler-clipboard-data' },
-    subject:'Dashboard',
+    subject:'Project',
     action:'Read',
     to: { name: 'project' },
 

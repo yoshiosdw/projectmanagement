@@ -8,6 +8,7 @@ import { useRoute } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import AddLine from './addLine.vue'
 import Edit from './edit.vue'
+import ability from '@/plugins/casl/ability'
 
 // import Person from '@/pages/ticket/person.vue'
 
@@ -18,6 +19,10 @@ const props = defineProps({
   },
 })
 
+// Ambil data user yang login dan simpan id nya dalam userId. 
+const userData = JSON.parse(localStorage.getItem('sinarjoUserData'))
+const userId = userData ? userData.id : null
+
 const emit = defineEmits(['saved'])
 const route = useRoute()
 const toast = useToast()
@@ -26,6 +31,7 @@ const Projectpriority = ref()
 const projectType = ref()
 const priority = ref()
 const status = ref()
+const attachment = ref()
 
 const isVisible = ref(false)
 const refForm = ref()
@@ -56,6 +62,7 @@ const planEndLine = ref()
 const ActualStartLine = ref()
 const ActualEndLine = ref()
 
+const notes = ref()
 
 const statusLine = ref()
 const priorityLine = ref()
@@ -82,6 +89,11 @@ const projectLineId = ref()
 const findText = ref('')
 const department = ref('')
 const requestorTicket = ref('')
+const requestorPerson = ref('')
+
+const displayRequestor = computed(() => {
+  return requestorTicket.value || requestorPerson.value
+})
 
 const fetchProjectId = async projectId => {
   isVisible.value = true
@@ -91,13 +103,14 @@ const fetchProjectId = async projectId => {
     })
 
     showLoading.value = false
-    projects.value = ret.data.data[0]
+    projects.value = ret.data.data
 
     department.value = projects.value.project_department?.description
     ticketNumber.value = projects.value.ticket?.document_number
     ticketDescription.value = projects.value.ticket?.description
 
     requestorTicket.value = projects.value.ticket?.user?.person?.name
+    requestorPerson.value = projects.value.requestor?.person?.name
 
     name.value = projects.value.name
     description.value = projects.value.description
@@ -109,6 +122,7 @@ const fetchProjectId = async projectId => {
     planEnd.value = projects.value.plan_end || ''
     ActualStart.value = projects.value.actual_start || ''
     ActualEnd.value = projects.value.actual_end || ''
+    attachment.value = projects.value.attachment_original_name || ''
   } catch (error) {
     console.log(error)
     toast.error('Failed Load Data')
@@ -139,6 +153,7 @@ const fetchProjectLine = async (projectId, page, perPage, find) => {
     planEndLine.value = projectLine.value?.plan_end || ''
     ActualStartLine.value = projectLine.value?.actual_start || ''
     ActualEndLine.value = projectLine.value?.actual_end || ''
+    notes.value = projectLine.value?.note || ''
 
     total.value = ret.data.meta.total
     last.value = ret.data.meta.last
@@ -347,16 +362,18 @@ const btnStartHandler = id => {
   })
 }
 
-const endProject = async id => {
+const endProject = async (id, note) => {
   showLoading.value = true
-
+  
   try {
-    const ret = await axiosIns.post(`/project/line/execution/done/${id}` )
+
+    const ret = await axiosIns.patch(`/project/line/execution/done/${id}`, 
+    // {note: note}
+    )
 
     fetchProjectLine(projectId.value, page.value, perPage.value, find.value)
 
     showLoading.value = false
-
   } catch(error) {
     Swal.fire({
       title: 'LBG',
@@ -372,13 +389,20 @@ const btnEndHandler = id => {
     title: 'LBG',
     text: 'Sure Ended Project Now?',
     icon: 'question',
+    // input: 'textarea', 
+    // inputAttributes: {
+    //   style: 'height: 60px;'
+    // },
+    // inputPlaceholder: 'Enter a note (optional)...',
     showCancelButton: true,
     confirmButtonColor: '#C51605',
     cancelButtonColor: 'default',
     confirmButtonText: 'Yes, End Now!',
+    cancelButtonText: 'Cancel',
   }).then(ret => {
     if(ret.isConfirmed) {
-      endProject(id)
+      // const note = ret.value || '';
+      endProject(id);
     }
   })
 }
@@ -417,6 +441,50 @@ const btnHoldHandler = id => {
       holdProject(id)
     }
   })
+}
+
+// Function ini digunakan untuk mengolah logika.  
+const btnDeleteDisabled = (data) => {
+  //Kalau status nya 1 dan 2 maka disabled nya jadi true
+  if (data.status === 2) {
+    return true
+  }
+
+  if (data.status === 1) {
+    return true
+  }
+
+  // Kalau user tidak punya permission maka disabled nya jadi true. Berlaku untuk button edit dan delete di project line
+  const hasProjectPermission = userData?.ability?.some(perm => perm.action === 'Manage' && perm.subject === 'Project')
+
+  if (!hasProjectPermission) {
+    return true
+  }
+}
+
+const btnEditDisabled = (data) => {
+  if (data.status === 2) {
+    return true
+  }
+
+  const hasProjectPermission = userData?.ability?.some(perm => perm.action === 'Manage' && perm.subject === 'Project')
+
+  if (!hasProjectPermission) {
+    return true
+  }
+}
+
+//Ini juga sama, hanya saja ada tambahan. Kalau user tidak memiliki permission dan assign to nya tidak sama dengan user yang login maka disabled nya jadi true
+const btnEndDisabled = (data) => {
+  if (data.status === 2) {
+    return true
+  }
+
+  const hasProjectPermission = userData?.ability?.some(perm => perm.action === 'Manage' && perm.subject === 'Project')
+
+  if (data?.assign_to?.person?.user?.id !== userId && !hasProjectPermission) {
+    return true
+  }
 }
 </script>
 
@@ -477,7 +545,7 @@ const btnHoldHandler = id => {
               </VCol>
               <VCol cols="8">
                 <VTextField
-                  v-model="requestorTicket"
+                  v-model="displayRequestor"
                   label="Ticket Requestor"
                   readonly
                   variant="filled"
@@ -516,6 +584,14 @@ const btnHoldHandler = id => {
                   readonly
                   :rules="[requiredValidator]"
                 />
+                <!--
+                  <VTextField
+                    v-model="attachment"
+                    label="Attachment"
+                    variant="filled"
+                    readonly
+                  />
+                  -->
               </VCol>
             </VRow>
             <VRow>
@@ -577,14 +653,7 @@ const btnHoldHandler = id => {
         <VRow>
           <VCol cols="12">
             <VCardText class="d-flex justify-between gap-4">
-              <!--
-                <div style="min-width: 80px;">
-                <VSelect 
-                  v-model="perPage"
-                  :items="[10,20,30,50]"
-                  />
-                </div>
-                -->
+              
               <div style="margin-left: auto;">
                 <AddLine
                   :header-id="projectId"
@@ -659,6 +728,14 @@ const btnHoldHandler = id => {
                 >
                   Actual End
                 </th>
+                <!--
+                  <th
+                    scope="col"
+                    class="text-no-wrap"
+                  >
+                    Note
+                  </th>
+                  -->
                 <th
                   scope="col"
                   class="text-no-wrap"
@@ -674,14 +751,15 @@ const btnHoldHandler = id => {
               >
                 <td style="width: 5rem;">
                   <div class="d-flex justify-start">
+                  <!-- Penerapan functionnya seperti ini -->
                     <VBtn
                       icon
                       variant="none"
                       color="warning"
                       title="Edit"
                       size="22"
-                      :disabled="data.status === 2"
                       @click="editLine(data.id)"
+                      :disabled="btnEditDisabled(data)"
                     >
                       <VIcon
                         icon="tabler-edit"
@@ -693,8 +771,8 @@ const btnHoldHandler = id => {
                       color="error"
                       title="Delete"
                       size="22"
-                      :disabled="data.status === 2 || data.status === 1"
                       @click="btnDeleteClickHandler(data.id)"
+                      :disabled="btnDeleteDisabled (data)"
                     >
                       <VIcon
                         icon="tabler-trash"
@@ -707,7 +785,7 @@ const btnHoldHandler = id => {
                       color="default"
                       size="22"
                       title="View More"
-                      :disabled="data.status === 2"
+                      :disabled="btnEndDisabled(data)"
                     >
                       <VIcon
                         :size="22"
@@ -736,6 +814,9 @@ const btnHoldHandler = id => {
                             v-if="data.status === 1 || data.status === 9"
                             @click="btnEndHandler(data.id)"
                           >
+                          <!--
+                            <Ended :project-id="data.id" @refresh="fetchProjectLine(projectId, page, perPage, find)"/>
+                            --> 
                             <VListItemTitle>
                               <VIcon
                                 variant="none"
@@ -751,7 +832,7 @@ const btnHoldHandler = id => {
                           <VDivider />
 
                           <VListItem
-                            v-if="data.status !== 3"
+                            v-if="data.status !== 3 && ability.can('Manage', 'Project')"
                             @click="btnHoldHandler(data.id)"
                           >
                             <VListItemTitle>
@@ -800,7 +881,7 @@ const btnHoldHandler = id => {
                     />
                   </div>
                 </td>
-                <td class="text-no-wrap">
+                <td style="white-space: normal; overflow-wrap: break-word; min-width: 500px;">
                   {{ data.description }}
                 </td>
                 <td class="text-no-wrap">
@@ -821,6 +902,11 @@ const btnHoldHandler = id => {
                 <td class="text-no-wrap">
                   {{ data.actual_end }}
                 </td>
+                <!--
+                  <td style="white-space: normal; overflow-wrap: break-word; min-width: 500px;">
+                    {{ data.note }}
+                  </td>
+                  -->
                 <td style="text-align: right;">
                   {{ data.actual_duration }}
                 </td>
@@ -829,17 +915,6 @@ const btnHoldHandler = id => {
           </VTable>
         </VCardText>
         <VCardText class="d-flex align-center flex-wrap justify-space-between gap-4 py-3 px-5">
-          <!--
-            <span class="text-sm text-disabled">
-            {{ paginationData }}
-          </span>
-          <VPagination
-            v-model="page"
-            size="small"
-            :total-visible="5"
-            :length="last"
-          />
-            -->
 
         </VCardText>
       </VCard>

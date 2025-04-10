@@ -1,6 +1,6 @@
 export default [
   {
-    heading: 'Barcode Generator',
+    heading: 'Barcode',
     subject:'Barcode',
     action:'Read',
   },
@@ -11,5 +11,11 @@ export default [
     action:'Read',
     to: 'barcode',
   },
+  {
+    title: 'Barcode Inquiries',
+    icon: { icon: 'tabler:file-barcode' },
+    subject:'Barcode',
+    action:'Read',
+    to: 'barcode-inquiries',
+  },
 ]
-  
