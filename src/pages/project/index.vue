@@ -2,6 +2,7 @@
 import List from './list/index.vue'
 import Board from './kanban/index.vue'
 import Summary from './summary/index.vue'
+import Timeline from './timeline/index.vue'
 import Configuration from './configuration/index.vue'
 
 const configTab = ref(null)
@@ -19,6 +20,11 @@ const tabs = [
   {
     title: 'Summary',
     icon: 'tabler-columns-3',
+
+  },
+  {
+    title: 'Timeline',
+    icon: 'tabler-route',
 
   },
   {
@@ -61,6 +67,10 @@ const tabs = [
 
         <VWindowItem>
           <Summary />
+        </VWindowItem>
+
+        <VWindowItem>
+          <Timeline />
         </VWindowItem>
 
         <VWindowItem>
