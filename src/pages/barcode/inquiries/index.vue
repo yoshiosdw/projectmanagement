@@ -2,7 +2,38 @@
 import axiosIns from '@/plugins/axios'
 import Swal from 'sweetalert2'
 import { ref, onMounted, computed, watch } from 'vue'
+import polos from '@/assets/barcodes/polos.png'
+import rebbecaV1 from '@/assets/barcodes/rebbeca-v1.png'
+import japanKyoei from '@/assets/barcodes/japan-kyoei.png'
+import japanOrdiy from '@/assets/barcodes/japan-ordiy.png'
+import japanTanpaUkuran from '@/assets/barcodes/japan-tanpa-ukuran.png'
+import merahBlank from '@/assets/barcodes/merah-blank.png'
+import merah from '@/assets/barcodes/merah.png'
+import plantf from '@/assets/barcodes/plant-f.png'
+import polos83 from '@/assets/barcodes/polos-83.png'
+import polosBlank from '@/assets/barcodes/polos-blank.png'
+import polosQuantity from '@/assets/barcodes/polos-quantity.png'
+import rebbeca from '@/assets/barcodes/rebbeca.png'
 
+const imageMapping = {
+  'polos.png': polos,
+  'rebbeca-v1.png': rebbecaV1,
+  'japan-kyoei.png': japanKyoei,
+  'japan-ordiy.png': japanOrdiy,
+  'japan-tanpa-ukuran.png': japanTanpaUkuran,
+  'merah-blank.png': merahBlank,
+  'merah.png': merah,
+  'plant-f.png': plantf,
+  'polos-83.png': polos83,
+  'polos-blank.png': polosBlank,
+  'polos-quantity.png': polosQuantity,
+  'rebbeca.png': rebbeca,
+}
+
+console.log('Image Mapping:', imageMapping)
+
+
+// State untuk data typelabel
 const typelabels = ref([]) // Untuk menyimpan data typelabel
 const showLoading = ref(false) // Untuk loading state
 const findText = ref('') // Untuk input pencarian
@@ -11,6 +42,7 @@ const currentPage = ref(1) // Halaman saat ini
 const totalItems = ref(0) // Total jumlah item
 const totalPages = ref(0) // Total halaman
 
+// Fungsi untuk fetch data dari API
 const fetchTypeLabels = async () => {
   showLoading.value = true
   try {
@@ -39,25 +71,30 @@ const fetchTypeLabels = async () => {
   }
 }
 
+// Fungsi untuk melakukan pencarian
 const search = () => {
   currentPage.value = 1 // Reset ke halaman pertama saat pencarian
   fetchTypeLabels()
 }
 
+// Fungsi untuk refresh data
 const refresh = () => {
   findText.value = '' // Kosongkan input pencarian
   currentPage.value = 1 // Reset ke halaman pertama
   fetchTypeLabels()
 }
 
+// Fetch data saat komponen dimuat
 onMounted(() => {
   fetchTypeLabels()
 })
 
+// Watch perubahan halaman
 watch(currentPage, () => {
   fetchTypeLabels()
 })
 
+// Pagination data
 const paginationData = computed(() => {
   const firstIndex = totalItems.value ? (currentPage.value - 1) * perPage.value + 1 : 0
   const lastIndex = Math.min(perPage.value * currentPage.value, totalItems.value)
@@ -65,8 +102,9 @@ const paginationData = computed(() => {
   return `Showing ${firstIndex} to ${lastIndex} of ${totalItems.value} entries`
 })
 
+// Handle error jika gambar gagal dimuat
 const handleImageError = typelabel => {
-  console.error(`Failed to load image for typelabel: ${typelabel.name}, URL: ${typelabel.image_url}`)
+  console.error(`Failed to load image for typelabel: ${typelabel.name}, File: ${typelabel.images}`)
 }
 </script>
 
@@ -151,7 +189,7 @@ const handleImageError = typelabel => {
               class="text-center"
             >
               <img
-                :src="typelabel.image_url"
+                :src="imageMapping[typelabel.images] || '/src/assets/barcodes/polos.png'"
                 alt="Image"
                 style="max-width: 70%; height: auto; object-fit: cover;"
                 @error="handleImageError(typelabel)"
@@ -178,8 +216,6 @@ const handleImageError = typelabel => {
     </VCol>
   </VRow>
 </template>
-
-
 
 <route lang="yaml">
 meta:
