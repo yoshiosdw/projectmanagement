@@ -383,6 +383,7 @@ const handleOutStanding = val => {
   const task = val
 
   jobOrderStore.task= task
+  jobOrderStore.page = 1 
 }
 </script>
 
