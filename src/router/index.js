@@ -3,6 +3,7 @@ import { setupLayouts } from 'virtual:generated-layouts'
 import { createRouter, createWebHistory } from 'vue-router'
 import routes from '~pages'
 import { isUserLoggedIn } from './utils'
+import { useJobOrder } from '@/pages/sat/useJobOrderStore'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -39,9 +40,13 @@ const router = createRouter({
 
 
 // Docs: https://router.vuejs.org/guide/advanced/navigation-guards.html#global-before-guards
-router.beforeEach(to => {
+router.beforeEach((to, from) => {
   const isLoggedIn = isUserLoggedIn()
+  const jobOrderStore = useJobOrder()
 
+  if ((from.name === 'sat' || from.name === 'sat-task-task') && to.name !== 'sat' && to.name !== 'sat-task-task') {
+    jobOrderStore.resetTaskState()
+  }
   /*
   
     ℹ️ Commented code is legacy code
