@@ -268,6 +268,10 @@ const openDialogEnd = async id =>{
   }
 }
 
+const openDatePicker = event => {
+  event.target.showPicker() 
+}
+
 const endTicket = async id => {
   // loading.value = true
   try {
@@ -673,12 +677,15 @@ const statusOptions = [
               <VForm>
                 <VRow>
                   <VCol cols="12">
-                    <VDateInput
+                    <VTextField
                       v-model="startDate"
                       label="Start Date Ticket"
-                      class="calender-date-picker"
+                      type="datetime-local"
                       density="compact"
-                      :config="{inline: true, enableTime: true, dateFormat: 'Y-m-d H:i', time_24hr: true, maxDate: dayjs().toDate()}"
+                      prepend-inner-icon=""
+                      variant="outlined"
+                      class="custom-date-field"
+                      @click="openDatePicker"
                     />
                   </VCol>
                 </VRow>
@@ -726,12 +733,15 @@ const statusOptions = [
                   mt="4"
                   cols="12"
                 >
-                  <VDateInput
+                  <VTextField
                     v-model="endDate"
                     label="End Date Ticket"
-                    class="calender-date-picker"
+                    type="datetime-local"
                     density="compact"
-                    :config="{inline: true, enableTime: true, dateFormat: 'Y-m-d H:i', time_24hr: true, maxDate: dayjs(new Date()).endOf('day').toDate()}"
+                    prepend-inner-icon=""
+                    variant="outlined"
+                    class="custom-date-field"
+                    @click="openDatePicker"
                   />
                 </VCol>
                 <!-- </VRow> -->
@@ -756,3 +766,11 @@ const statusOptions = [
     </VCol>
   </VRow>
 </template>
+
+<style>
+/* Menyembunyikan ikon kalender bawaan */
+.custom-date-field input::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+}
+</style>
