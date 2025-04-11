@@ -120,6 +120,59 @@ const generateTasksFromHeader = () => {
 }
 
 
+// Fungsi bantu: Update header jika perlu
+const updateHeaderIfLineExtended = async (lineId, newEndDate) => {
+  const affectedHeader = headers.value.find(header =>
+    Array.isArray(header.line) && header.line.some(line => line.id == lineId),
+  )
+
+  if (!affectedHeader) return
+
+  const movedLineEnd = new Date(newEndDate)
+  const headerEnd = new Date(affectedHeader.plan_end)
+
+  if (movedLineEnd > headerEnd) {
+    await axiosIns.post(`/projects/${affectedHeader.id}`, {
+      plan_start: affectedHeader.plan_start,
+      plan_end: formatDateMySql(movedLineEnd),
+    })
+
+    toast.success(`Header updated: ${affectedHeader.name}`)
+  }
+}
+
+// Fungsi bantu: Update task (baik header atau line)
+const updateTaskDates = async (task, start, end) => {
+  const isHeader = task.id.startsWith('h-')
+  const isLine = task.id.startsWith('l-')
+  const cleanId = task.id.replace(/^h-/, '').replace(/^l-/, '')
+
+  try {
+    if (isHeader) {
+      await axiosIns.post(`/projects/${cleanId}`, {
+        plan_start: formatDateMySql(start),
+        plan_end: formatDateMySql(end),
+      })
+    } else if (isLine) {
+      await axiosIns.patch(`/project/line/${cleanId}`, {
+        plan_start: formatDateMySql(start),
+        plan_end: formatDateMySql(end),
+      })
+
+      await updateHeaderIfLineExtended(cleanId, end)
+    }
+
+    toast.success(`Updated: ${task.name}`)
+
+    // Refresh data dan render ulang
+    await fetchProject()
+    renderGanttChart()
+  } catch (err) {
+    console.error('Failed to update:', err)
+    toast.error(`Failed to update ${task.name}`)
+  }
+}
+
 const renderGanttChart = async () => {
   await nextTick()
 
@@ -144,72 +197,9 @@ const renderGanttChart = async () => {
     padding: 18,
     view_mode: currentViewMode.value,
     date_format: 'YYYY-MM-DD',
-
-    //send to backend
-    on_date_change: async (task, start, end) => {
-      const isHeader = task.id.startsWith('h-')
-      const isLine = task.id.startsWith('l-')
-      const cleanId = task.id.replace(/^h-/, '').replace(/^l-/, '')
-
-      console.log('Updating:', {
-        id: cleanId,
-        type: isHeader ? 'project' : 'line',
-        start,
-        end,
-      })
-
-      try {
-        if (isHeader) {
-          await axiosIns.post(`/projects/${cleanId}`, {
-            plan_start: formatDateMySql(start),
-            plan_end: formatDateMySql(end),
-          })
-
-          toast.success(`Updated: ${task.name}`)
-        } else if (isLine) {
-          await axiosIns.patch(`/project/line/${cleanId}`, {
-            plan_start: formatDateMySql(start),
-            plan_end: formatDateMySql(end),
-          })
-
-          // Cari header yang memiliki line ini
-          const affectedHeader = headers.value.find(header =>
-            Array.isArray(header.line) &&
-        header.line.some(line => line.id == cleanId),
-          )
-
-          if (affectedHeader) {
-            const movedLineEnd = new Date(end)
-            const headerEnd = new Date(affectedHeader.plan_end)
-
-            if (movedLineEnd > headerEnd) {
-              // Hanya update jika line.plan_end lebih besar dari header.plan_end
-              await axiosIns.post(`/projects/${affectedHeader.id}`, {
-                plan_start: affectedHeader.plan_start,
-                plan_end: formatDateMySql(movedLineEnd),
-              })
-
-              toast.success(`Header updated: ${affectedHeader.name}`)
-            }
-          }
-
-          toast.success(`Updated: ${task.name}`)
-        }
-
-        // Fetch ulang data dan render ulang Gantt
-        await fetchProject()
-        renderGanttChart()
-      } catch (err) {
-        console.error('Failed to update:', err)
-        toast.error(`Failed to update ${task.name}`)
-      }
-    },
-
-
+    on_date_change: updateTaskDates,
   })
-  
 
-  // Tambah tahun ke label bulan
   setTimeout(() => {
     const monthLabels = document.querySelectorAll('.grid-header .tick text')
 
@@ -224,6 +214,7 @@ const renderGanttChart = async () => {
     })
   }, 100)
 }
+
 
 watch(openGroups, renderGanttChart)
 watch(currentViewMode, renderGanttChart)
