@@ -67,6 +67,10 @@ watchEffect(() =>{
 const paginationData = computed(() => {
   return `Showing ${from.value} to ${to.value} of ${total.value} entries`
 })
+
+defineExpose({
+  fetchPrintProduct,
+})
 </script>
 
 <template>
