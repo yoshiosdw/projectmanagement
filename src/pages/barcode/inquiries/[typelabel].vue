@@ -24,6 +24,9 @@ const totalPage = ref(1)
 const pengawas = ref("")
 const operator = ref("")
 const code_container = ref("")
+const noBarcode = ref("")
+const batch = ref("")
+const newsize = ref("")
 const showQrCode = ref(true)
 const showMachineNumber = ref(true)
 const showCodeContainer = ref(true)
@@ -169,6 +172,9 @@ const printBarcode = async () => {
       showMachineNumber: showMachineNumber.value,
       showCodeContainer: showCodeContainer.value,
       code_container: code_container.value,
+      barcode: noBarcode.value,
+      newsize: newsize.value,
+      batch: batch.value,
     }
 
     const response = await axiosIns.post("/barcodes/print/barcode", params, {
@@ -213,12 +219,6 @@ const validateForm = () => {
 <template>
   <VRow>
     <VCol cols="12">
-      <VBtn
-        prepend-icon="tabler-chevron-left"
-        :to="{ name: 'barcode-inquiries' }"
-      >
-        Back
-      </VBtn>
       <VCard>
         <VCardText>
           <h3>
@@ -267,7 +267,7 @@ const validateForm = () => {
                   label="SHIFT"
                   item-value="id"
                   item-title="name"
-                  required
+                  :rules="[requiredValidator]"
                 />
               </VCol>
               <VCol
@@ -318,7 +318,7 @@ const validateForm = () => {
                   label="UNIT"
                   item-value="id"
                   item-title="name"
-                  required
+                  :rules="[requiredValidator]"
                 />
               </VCol>
               <VCol
@@ -327,10 +327,11 @@ const validateForm = () => {
                 md="4"
               >
                 <VTextField
-                  v-model="barcode"
+                  v-model="noBarcode"
                   label="NO BARCODE"
                   clearable
                   type="text"
+                  :rules="[requiredValidator]"
                 />
               </VCol>
               <VCol
@@ -343,6 +344,7 @@ const validateForm = () => {
                   label="SIZE"
                   clearable
                   type="text"
+                  :rules="[requiredValidator]"
                 />
               </VCol>
               <VCol
@@ -355,6 +357,7 @@ const validateForm = () => {
                   label="BATCH"
                   clearable
                   type="text"
+                  :rules="[requiredValidator]"
                 />
               </VCol>
               <VCol
@@ -366,6 +369,7 @@ const validateForm = () => {
                   label="PENGAWAS"
                   clearable
                   type="text"
+                  :rules="[requiredValidator]"
                 />
               </VCol>
               <VCol
@@ -377,6 +381,7 @@ const validateForm = () => {
                   label="OPERATOR"
                   clearable
                   type="text"
+                  :rules="[requiredValidator]"
                 />
               </VCol>
               <VCol
@@ -387,6 +392,7 @@ const validateForm = () => {
                   v-model="code_container"
                   label="CODE CONTAINER"
                   type="text"
+                  :rules="[requiredValidator]"
                 />
               </VCol>
               
@@ -409,7 +415,6 @@ const validateForm = () => {
                   label="Tampilkan Code Container?"
                 />
               </VCol>
-              <!-- Kondisi untuk menampilkan select mesin jika ivs_machine kosong -->
               <VCol
                 v-if="showMachineSelect"
                 cols="12"
@@ -434,12 +439,20 @@ const validateForm = () => {
                 />
               </VCol>
               <VCol cols="12">
-                <VBtn
-                  prepend-icon="tabler-printer"
-                  @click="validateForm"
-                >
-                  PRINT
-                </VBtn>
+                <div class="d-flex justify-end gap-4">
+                  <VBtn
+                    :to="{name: 'barcode-inquiries'}"
+                    color="warning"
+                  >
+                    Close
+                  </VBtn>
+                  <VBtn
+                    prepend-icon="tabler-printer"
+                    @click="validateForm"
+                  >
+                    PRINT
+                  </VBtn>
+                </div>
               </VCol>
             </VRow>
           </VForm>
