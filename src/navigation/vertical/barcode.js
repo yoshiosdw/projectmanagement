@@ -6,7 +6,7 @@ export default [
   },
 
   // {
-  //   title: 'Cetak Barcode',
+  //   title: 'Barcode Generator',
   //   icon: { icon: 'tabler:barcode' },
   //   subject:'Barcode',
   //   action:'Read',
