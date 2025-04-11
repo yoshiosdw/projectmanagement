@@ -834,6 +834,10 @@ const downloadFile = async filename => {
     loading.value = false
   }
 }
+
+const openDatePicker = event => {
+  event.target.showPicker() 
+}
 </script>
 
 <template>
@@ -1760,12 +1764,15 @@ const downloadFile = async filename => {
               <VForm>
                 <VRow>
                   <VCol cols="12">
-                    <AppDateTimePicker
+                    <VTextField
                       v-model="startDate"
                       label="Start Date Ticket"
-                      class="calender-date-picker"
+                      type="datetime-local"
                       density="compact"
-                      :config="{inline: true, enableTime: true, dateFormat: 'Y-m-d H:i', time_24hr: true, maxDate: dayjs().toDate()}"
+                      prepend-inner-icon=""
+                      variant="outlined"
+                      class="custom-date-field"
+                      @click="openDatePicker"
                     />
                   </VCol>
                 </VRow>
@@ -1812,12 +1819,15 @@ const downloadFile = async filename => {
                   mt="4"
                   cols="12"
                 >
-                  <AppDateTimePicker
+                  <VTextField
                     v-model="endDate"
                     label="End Date Ticket"
-                    class="calender-date-picker"
+                    type="datetime-local"
                     density="compact"
-                    :config="{inline: true, enableTime: true, dateFormat: 'Y-m-d H:i', time_24hr: true, maxDate: dayjs(new Date()).endOf('day').toDate()}"
+                    prepend-inner-icon=""
+                    variant="outlined"
+                    class="custom-date-field"
+                    @click="openDatePicker"
                   />
                 </VCol>
               </VForm>    
@@ -1845,6 +1855,11 @@ const downloadFile = async filename => {
 <style scoped>
 .custom-icon-color {
   color: #050c9c;
+}
+
+.custom-date-field input::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
 }
 </style>
 

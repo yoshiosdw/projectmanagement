@@ -277,7 +277,7 @@ const goBack = () =>{
                 v-model="planStart"
                 label="Plan Start"
                 type="datetime-local"
-                density="comfortable"
+                density="compact"
                 variant="outlined"
                 class="custom-date-field"
                 @click="openDatePicker"
@@ -288,7 +288,7 @@ const goBack = () =>{
                 v-model="endTarget"
                 label="Plan End"
                 type="datetime-local"
-                density="comfortable"
+                density="compact"
                 variant="outlined"
                 class="custom-date-field"
                 @click="openDatePicker"
@@ -386,6 +386,15 @@ const goBack = () =>{
     </VCol>
   </VRow>
 </template>
+
+
+<style>
+/* Menyembunyikan ikon kalender bawaan */
+.custom-date-field input::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+}
+</style>
 
 <route lang="yaml">
   meta:
