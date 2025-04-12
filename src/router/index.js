@@ -44,7 +44,7 @@ router.beforeEach((to, from) => {
   const isLoggedIn = isUserLoggedIn()
   const jobOrderStore = useJobOrder()
 
-  if ((from.name === 'sat' || from.name === 'sat-task-task') && to.name !== 'sat' && to.name !== 'sat-task-task') {
+  if ((from.name === 'sat' || from.name === 'sat-task-task' || from.name === 'sat-id') && to.name !== 'sat' && to.name !== 'sat-task-task' && to.name !== 'sat-id') {
     jobOrderStore.resetTaskState()
   }
   /*
