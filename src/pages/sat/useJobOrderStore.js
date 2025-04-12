@@ -15,4 +15,10 @@ export const useJobOrder = defineStore("jobOrderStore", {
     to: 1,
     clickedTask: null
   }),
+  actions: {
+    resetTaskState() {
+      this.task = null;
+      this.clickedTask = null;
+    }
+  }
 });
