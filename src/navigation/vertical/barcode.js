@@ -6,15 +6,15 @@ export default [
   },
 
   // {
-  //   title: 'Cetak Barcode',
+  //   title: 'Barcode Generator',
   //   icon: { icon: 'tabler:barcode' },
   //   subject:'Barcode',
   //   action:'Read',
   //   to: 'barcode',
   // },
   {
-    title: 'Barcode Inquiries',
-    icon: { icon: 'tabler:file-barcode' },
+    title: 'Cetak Label',
+    icon: { icon: 'tabler:barcode' },
     subject:'Barcode',
     action:'Read',
     to: 'barcode-inquiries',

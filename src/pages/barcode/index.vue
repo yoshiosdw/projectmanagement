@@ -28,6 +28,7 @@ const showMachineNumber = ref(true)
 const showCodeContainer = ref(true)
 const refForm = ref()
 const idProd = ref()
+const reportRef = ref(null)
 
 const fetchShift = async ()=> {
   try {
@@ -108,6 +109,8 @@ const printBarcode = async ()=> {
     const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }))
 
     window.open(url, '_blank')
+
+    reportRef.value?.fetchPrintProduct(1, 10, productionId.value, '')
     
   } catch (error) {
     console.log(error)
@@ -311,7 +314,7 @@ const validateForm = () => {
     </VCol>
     <VCol>
       <VCard>
-        <Report :bo-number="idProd" />
+        <Report ref="reportRef" :bo-number="idProd" />
       </VCard>
     </VCol>
   </VRow>
