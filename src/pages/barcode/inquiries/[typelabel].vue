@@ -3,7 +3,7 @@ import { requiredValidator } from "@/@core/utils/validators"
 import axiosIns from "@/plugins/axios"
 import { onMounted, ref, watchEffect } from "vue"
 import { useToast } from "vue-toastification"
-import { useRoute, useRouter } from "vue-router" // Import useRoute dan useRouter untuk menangani route dan parameter
+import { useRoute, useRouter } from "vue-router" 
 
 const toast = useToast()
 const route = useRoute() // Akses route untuk mendapatkan parameter
@@ -38,7 +38,6 @@ const shift = ref() // Inisialisasi shift
 const unit = ref() // Inisialisasi unit
 const machine = ref() // Inisialisasi mesin
 
-// Fungsi untuk mengambil data shift
 const fetchShift = async () => {
   try {
     const res = await axiosIns.get("/shift")
@@ -331,7 +330,6 @@ const validateForm = () => {
                   label="NO BARCODE"
                   clearable
                   type="text"
-                  :rules="[requiredValidator]"
                 />
               </VCol>
               <VCol
@@ -344,7 +342,6 @@ const validateForm = () => {
                   label="SIZE"
                   clearable
                   type="text"
-                  :rules="[requiredValidator]"
                 />
               </VCol>
               <VCol
@@ -357,7 +354,6 @@ const validateForm = () => {
                   label="BATCH"
                   clearable
                   type="text"
-                  :rules="[requiredValidator]"
                 />
               </VCol>
               <VCol
@@ -392,7 +388,6 @@ const validateForm = () => {
                   v-model="code_container"
                   label="CODE CONTAINER"
                   type="text"
-                  :rules="[requiredValidator]"
                 />
               </VCol>
               

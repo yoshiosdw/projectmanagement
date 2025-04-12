@@ -13,8 +13,8 @@ export default [
   //   to: 'barcode',
   // },
   {
-    title: 'Barcode Inquiries',
-    icon: { icon: 'tabler:file-barcode' },
+    title: 'Cetak Label',
+    icon: { icon: 'tabler:barcode' },
     subject:'Barcode',
     action:'Read',
     to: 'barcode-inquiries',
