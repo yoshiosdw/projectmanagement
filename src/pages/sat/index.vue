@@ -115,6 +115,10 @@ const picOptions = [
   { text: 'PPIC' },
 ]
 
+const optionHandler = () => {
+  jobOrderStore.page = 1
+}
+
 const deleteData = async id => {
   loading.value = true
   try {
@@ -413,6 +417,7 @@ const handleOutStanding = val => {
               :items="statusOptions"
               item-title="text"
               item-value="value"
+              @update:model-value="optionHandler"
               clearable
             />
             <VSelect 
@@ -421,6 +426,7 @@ const handleOutStanding = val => {
               :items="picOptions"
               item-title="text"
               item-value="text"
+              @update:model-value="optionHandler"
               clearable
             />
           </div>
