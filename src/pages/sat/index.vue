@@ -32,14 +32,15 @@ const fetchJoborder = async (page, perPage, find, status, pic, task) => {
     const params = {
       page: page,
       perPage: perPage,
-      find: find,        
+      find: find, 
+      status: status,       
       pic: pic,
       next_task: task,
     }
 
-    if (status !== null) {
-      params.status = status
-    }
+    // if (status !== null) {
+    //   params.status = status
+    // }
     
     // if (pic !== null) {
     //   pic = selectedPic.value;
@@ -82,7 +83,7 @@ const fetchAllJobOrder = async() => {
 
 watchEffect(() => {
   // fetchAllJobOrder(),
-  fetchJoborder(jobOrderStore.page, jobOrderStore.perPage, find.value, selectedStatus.value, jobOrderStore.pic, jobOrderStore.task)
+  fetchJoborder(jobOrderStore.page, jobOrderStore.perPage, find.value, jobOrderStore.status, jobOrderStore.pic, jobOrderStore.task)
 
   // fetchJoborder(page.value, perPage.value, find.value, selectedStatus.value, selectedPic.value)
 })
@@ -95,6 +96,7 @@ const findSat = async () => {
   jobOrderStore.find = find.value
 
   // jobOrderStore.pic = selectedPic.value
+  jobOrderStore.status = route.query.status
   jobOrderStore.pic = route.query.pic
   jobOrderStore.task = route.query.task
 }
@@ -124,7 +126,7 @@ const deleteData = async id => {
   try {
     const ret = await axiosIns.delete(`/job/orders/${id}` )
 
-    fetchJoborder(jobOrderStore.page, jobOrderStore.perPage, find.value, selectedStatus.value, jobOrderStore.pic, jobOrderStore.task)
+    fetchJoborder(jobOrderStore.page, jobOrderStore.perPage, find.value, jobOrderStore.status, jobOrderStore.pic, jobOrderStore.task)
   } catch (error) {
     Swal.fire({
       title: 'LBG',
@@ -157,7 +159,7 @@ const revisedData = async id => {
   try {
     const ret = await axiosIns.patch(`/job/orders/revised/${id}`, {} )
 
-    fetchJoborder(jobOrderStore.page, jobOrderStore.perPage, find.value, selectedStatus.value, jobOrderStore.pic, jobOrderStore.task)
+    fetchJoborder(jobOrderStore.page, jobOrderStore.perPage, find.value, jobOrderStore.status, jobOrderStore.pic, jobOrderStore.task)
     loading.value = false
   } catch(error) {
     Swal.fire({
@@ -190,7 +192,7 @@ const cancelData = async id => {
   try {
     const ret = await axiosIns.patch(`/job/orders/cancel/${id}`, null )
 
-    fetchJoborder(jobOrderStore.page, jobOrderStore.perPage, find.value, selectedStatus.value, jobOrderStore.pic, jobOrderStore.task)
+    fetchJoborder(jobOrderStore.page, jobOrderStore.perPage, find.value, jobOrderStore.status, jobOrderStore.pic, jobOrderStore.task)
     loading.value = false
   } catch(error) {
     Swal.fire({
@@ -257,7 +259,7 @@ const resolveStatusVariant = status => {
 }
 
 const reloadSatData = () => {
-  fetchJoborder(jobOrderStore.page, jobOrderStore.perPage, find.value, selectedStatus.value, jobOrderStore.pic, jobOrderStore.task)
+  fetchJoborder(jobOrderStore.page, jobOrderStore.perPage, find.value, jobOrderStore.status, jobOrderStore.pic, jobOrderStore.task)
 }
 
 const handleCaseUpdated = isUpdated => {
@@ -351,7 +353,7 @@ const revokedData = async id => {
   try {
     const ret = await axiosIns.patch(`job/orders/revoked/data/${id}`)
 
-    fetchJoborder(jobOrderStore.page, jobOrderStore.perPage, find.value, selectedStatus.value, jobOrderStore.pic, jobOrderStore.task)
+    fetchJoborder(jobOrderStore.page, jobOrderStore.perPage, find.value, jobOrderStore.status, jobOrderStore.pic, jobOrderStore.task)
     loading.value = false
   } catch (error) {
     Swal.fire({
@@ -412,7 +414,7 @@ const handleOutStanding = val => {
             style="width: 20rem;"
           >
             <VSelect 
-              v-model="selectedStatus"
+              v-model="jobOrderStore.status"
               label="Status"
               :items="statusOptions"
               item-title="text"
