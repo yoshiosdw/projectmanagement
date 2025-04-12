@@ -7,6 +7,7 @@ export const useJobOrder = defineStore("jobOrderStore", {
     find: '',
     pic: null,
     task: null,
+    status: null,
     page: 1,
     perPage: 10,
     total: 0,
@@ -19,6 +20,8 @@ export const useJobOrder = defineStore("jobOrderStore", {
     resetTaskState() {
       this.task = null;
       this.clickedTask = null;
+      this.pic = null;
+      this.status = null;
     }
   }
 });
