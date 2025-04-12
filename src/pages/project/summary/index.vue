@@ -15,19 +15,19 @@ import axiosIns from '@/plugins/axios'
 import Monthly from './dashboard/monthly.vue'
 import BiuCount from './dashboard/byBiu.vue'
 
-const inprogress = ref([])
-const todo = ref([])
-const hold = ref([])
-const done = ref([])
-const priority = ref([])
-const allTask = ref([])
-const totalproject = ref([])
-const overdueData = ref([])
-const trackData = ref([])
-const lastMonthFirst = ref([])
-const lastMonthSecond = ref([])
-const lastMonthThree = ref([])
-const monthName = ref([])
+const inprogress = ref(0)
+const todo = ref(0)
+const hold = ref(0)
+const done = ref(0)
+const priority = ref(0)
+const allTask = ref(0)
+const totalproject = ref(0)
+const overdueData = ref(0)
+const trackData = ref(0)
+const lastMonthFirst = ref(0)
+const lastMonthSecond = ref(0)
+const lastMonthThree = ref(0)
+const monthName = ref(0)
 
 const fetchData = async () => {
 
