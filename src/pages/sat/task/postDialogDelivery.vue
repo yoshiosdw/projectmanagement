@@ -93,9 +93,10 @@ const cancelClickHandler = () => {
       <VCardText>
         <VForm ref="taskForm" @submit.prevent="onSubmit" style="height: auto;">
           <VRow>
-            <VCol cols="12">
+            <VCol cols="8">
               <VTextField :readonly="true">{{ props.data.task_name }}</VTextField>
-              <div class="mt-5">
+            </VCol>
+            <VCol cols="4">
                 <VDateInput
                   :model-value="new Date().toJSON().slice(0, 10)"
                   v-model="confirmationDate"
@@ -106,13 +107,16 @@ const cancelClickHandler = () => {
                   label="Shipdate Confirmation"
                   :rules="[requiredValidator]"
                 />
-              </div>
+            </VCol>
+          </VRow>
+          <VRow>
+            <VCol cols="12">
               <VTextarea 
                 label="Note" 
                 v-model="note"
                 rows="2"
               />
-              </VCol>
+            </VCol>
           </VRow>
           <VRow>
             <VCol cols="12">
