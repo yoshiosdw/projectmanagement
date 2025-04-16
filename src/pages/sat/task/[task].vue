@@ -520,31 +520,31 @@ const resolveAttachVariant = attachment => {
                           </VListItem> 
                         -->
 
-                        <VListItem v-if="(data.status === 0 || data.status === 2) && ability.can(data.permissions.split(' - ')[1], data.permissions.split(' - ')[0]) && (data.task_sequence === 4)">
+                        <VListItem :style="{ cursor: 'pointer' }" v-if="(data.status === 0 || data.status === 2) && ability.can(data.permissions.split(' - ')[1], data.permissions.split(' - ')[0]) && (data.task_sequence === 4)">
                           <PostDialogCopyDelivery
                             :data="data"
                             @task-uploaded="handlePostUpdated"
                           /> 
                         </VListItem>
-                        <VListItem v-if="(data.status === 0 || data.status === 2) && ability.can(data.permissions.split(' - ')[1], data.permissions.split(' - ')[0]) && (data.task_sequence === 6)">
+                        <VListItem :style="{ cursor: 'pointer' }" v-if="(data.status === 0 || data.status === 2) && ability.can(data.permissions.split(' - ')[1], data.permissions.split(' - ')[0]) && (data.task_sequence === 6)">
                           <PostDialog
                             :data="data"
                             @task-uploaded="handlePostUpdated"
                           /> 
                         </VListItem>
-                        <VListItem v-if="(data.status === 0 || data.status === 9) && ability.can(data.permissions.split(' - ')[1], data.permissions.split(' - ')[0]) && (data.task_sequence !== 4 && data.task_sequence !== 6 && data.task_sequence !== 3)">
+                        <VListItem :style="{ cursor: 'pointer' }" v-if="(data.status === 0 || data.status === 9) && ability.can(data.permissions.split(' - ')[1], data.permissions.split(' - ')[0]) && (data.task_sequence !== 4 && data.task_sequence !== 6 && data.task_sequence !== 3)">
                           <ProcessDialog
                             :data="data"
                             @task-uploaded="handlePostUpdated"
                           />
                         </VListItem>
-                        <VListItem v-if="(data.status === 0 || data.status === 9) && ability.can(data.permissions.split(' - ')[1], data.permissions.split(' - ')[0]) && (data.task_sequence == 3)">
+                        <VListItem :style="{ cursor: 'pointer' }" v-if="(data.status === 0 || data.status === 9) && ability.can(data.permissions.split(' - ')[1], data.permissions.split(' - ')[0]) && (data.task_sequence == 3)">
                           <processDialogFeedbackRnd
                             :data="data"
                             @task-uploaded="handlePostUpdated"
                           />
                         </VListItem>
-                        <VListItem v-if="(data.status === 1) && ability.can('Reject', 'PPIC SAT Task') && data.task_sequence === 1">
+                        <VListItem :style="{ cursor: 'pointer' }" v-if="(data.status === 1) && ability.can('Reject', 'PPIC SAT Task') && data.task_sequence === 1">
                           <RejectDialog
                             :data="data"
                             @task-uploaded="handlePostUpdated"
@@ -556,7 +556,7 @@ const resolveAttachVariant = attachment => {
                             @task-uploaded="handlePostUpdated"
                           />
                         </VListItem> -->
-                        <VListItem v-if="(data.status === 1) && data.task_sequence === 4 && (data.transaction_date !== null) && ability.can('Revised', 'BOA SAT Task')">
+                        <VListItem :style="{ cursor: 'pointer' }" v-if="(data.status === 1) && data.task_sequence === 4 && (data.transaction_date !== null) && ability.can('Revised', 'BOA SAT Task')">
                           <RevisedDialog
                             :data="data"
                             @task-uploaded="handlePostUpdated"
