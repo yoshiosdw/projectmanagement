@@ -46,6 +46,12 @@ export default [
         subject:'SAT',
         action:'Read',
       },
+      {
+        title: 'Configuration',
+        to: { name: 'sat-configuration'},
+        subject:'SAT',
+        action:'Read',
+      },
     ]
   },
   {
