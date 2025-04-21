@@ -309,7 +309,6 @@ const goBack = () =>{
                 style="height: 40px;"
               />
               <Person 
-                style="height: 40px;"
                 :ticket="ticketId"
                 @person="getValueFromPerson"
               />
