@@ -463,8 +463,8 @@ const fetchDataFromAPI = async () => {
         find: find.value,
         type: selectedTicketType,
         status_name: selectedStatus.value,
-        fromdate:fromdate.value,
-        todate:todate.value,
+        fromdate: fromdate.value ? new Date(fromdate.value).toISOString().split("T")[0] : null,
+        todate: todate.value ? new Date(todate.value).toISOString().split("T")[0] : null,
       },
     })
 
