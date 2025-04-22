@@ -72,8 +72,8 @@ const fetchTicket = async (page, perPage, find, selectedType, selectedDepartment
         type: selectedType,
         department_in_charge: selectedDepartment,
         status_name: status || null,
-        fromdate: fromdate ? new Date(fromdate).toISOString().split("T")[0] : null ,
-        todate: todate ? new Date(todate).toISOString().split("T")[0] : null,
+        fromdate: fromdate ? new Date(fromdate).toLocaleDateString("en-CA") : null,
+        todate: todate ? new Date(todate).toLocaleDateString("en-CA") : null,
       },
     })
 
@@ -463,8 +463,10 @@ const fetchDataFromAPI = async () => {
         find: find.value,
         type: selectedTicketType,
         status_name: selectedStatus.value,
-        fromdate: fromdate.value ? new Date(fromdate.value).toISOString().split("T")[0] : null,
-        todate: todate.value ? new Date(todate.value).toISOString().split("T")[0] : null,
+        // fromdate: fromdate.value ? new Date(fromdate.value).toISOString().split("T")[0] : null,
+        // todate: todate.value ? new Date(todate.value).toISOString().split("T")[0] : null,
+        fromdate: fromdate.value ? new Date(fromdate.value).toLocaleDateString("en-CA") : null,
+        todate: todate.value ? new Date(todate.value).toLocaleDateString("en-CA") : null,
       },
     })
 
