@@ -548,6 +548,7 @@ const computedRulesBuilding = computed(() => {
                   item-value="id"
                   label="Type Request"
                   :readonly="readonlyFields"
+                  :rules="[requiredValidator]"
                 />
               </VCol>
 
