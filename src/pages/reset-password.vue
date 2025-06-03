@@ -35,29 +35,29 @@ const password = ref('')
 const login = async () => {
   loading.value = true
   try {
-    const ret = await axiosIns.post('/login', {
-        username: username.value,
-        password: password.value
+    const res = await axiosIns.post('/reset-password', {
+      username: username.value,
     })
-    console.log(ret);
-    const sinarjoUserAbilities = ret.data.data.ability
-    const sinarjoUserData = ret.data.data
-    const sinarjoAccessToken = ret.data.meta.token
-    loading.value = false
-    localStorage.setItem('sinarjoUserAbilities', JSON.stringify(sinarjoUserAbilities))
-    ability.update(sinarjoUserAbilities)
-    localStorage.setItem('sinarjoUserData', JSON.stringify(sinarjoUserData))
-    localStorage.setItem('sinarjoAccessToken', sinarjoAccessToken) 
 
-    router.replace(route.query.to ? String(route.query.to) : '/')
-  } catch (error) {
-    Swal.fire({
-      title: 'LBG',
-      text: 'Username atau password Anda salah',
-      icon: 'error'
-    })
     loading.value = false
-    console.log(error);
+
+    Swal.fire({
+      title: 'Berhasil',
+      text: 'Password berhasil di-reset. Silakan cek email Anda.',
+      icon: 'success',
+    }).then(() => {
+      router.push('/login')
+    })
+  } catch (error) {
+    loading.value = false
+
+    Swal.fire({
+      title: 'Gagal',
+      text: error?.response?.data?.message || 'Terjadi kesalahan.',
+      icon: 'error',
+    })
+
+    console.log(error)
   }
 }
 
@@ -114,7 +114,7 @@ const onSubmit = () => {
             Welcome to {{ themeConfig.app.title }}! 👋🏻
           </h5>
           <p class="mb-0">
-            Please sign-in to your account and start the adventure
+            Silakan tulis username Anda untuk me-reset password
           </p>
         </VCardText>
 
@@ -130,41 +130,27 @@ const onSubmit = () => {
                   v-model="username"
                   label="Username"
                   :rules="[requiredValidator]"
-                  :error-messages="errors.email"
+                  :error-messages="errors.username"
                 />
+                 <div class="d-flex align-center flex-wrap justify-space-between mt-2">
+                  <RouterLink
+                    class="text-primary ms-2 "
+                    :to="{ name: 'login' }"
+                  >
+                    Back to login
+                  </RouterLink>
+                </div>
               </VCol>
 
               <!-- password -->
               <VCol cols="12">
-                <VTextField
-                  v-model="password"
-                  label="Password"
-                  :rules="[requiredValidator]"
-                  :type="isPasswordVisible ? 'text' : 'password'"
-                  :error-messages="errors.password"
-                  :append-inner-icon="isPasswordVisible ? 'tabler-eye-off' : 'tabler-eye'"
-                  @click:append-inner="isPasswordVisible = !isPasswordVisible"
-                />
-
-                <div class="d-flex align-center flex-wrap justify-space-between mt-2 mb-4">
-                  <span class="ms-2 mb-1">
-                    Tidak bisa login?
-                    <RouterLink
-                      class="text-primary"
-                      :to="{ name: 'reset-password' }"
-                    >
-                      Reset Password
-                    </RouterLink>
-                  </span>
-                </div>
-
                 <VBtn
                   block
                   type="submit"
                   :loading="loading"
                   :disabled="loading"
                 >
-                  Login
+                  Reset Password
                 </VBtn>
               </VCol>
             </VRow>
