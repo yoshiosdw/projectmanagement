@@ -147,15 +147,7 @@ const onSubmit = () => {
                 />
 
                 <div class="d-flex align-center flex-wrap justify-space-between mt-2 mb-4">
-                  <span class="ms-2 mb-1">
-                    Tidak bisa login?
-                    <RouterLink
-                      class="text-primary"
-                      :to="{ name: 'reset-password' }"
-                    >
-                      Reset Password
-                    </RouterLink>
-                  </span>
+                  
                 </div>
 
                 <VBtn
@@ -166,6 +158,18 @@ const onSubmit = () => {
                 >
                   Login
                 </VBtn>
+
+                <div class="d-flex align-center flex-wrap justify-space-between mt-2 mb-4">
+                  <span class="ms-2 mb-1">
+                    Tidak bisa login?
+                    <RouterLink
+                      class="text-primary"
+                      :to="{ name: 'reset-password' }"
+                    >
+                      Reset Password
+                    </RouterLink>
+                  </span>
+                </div>
               </VCol>
             </VRow>
           </VForm>

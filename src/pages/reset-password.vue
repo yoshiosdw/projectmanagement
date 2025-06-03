@@ -132,14 +132,6 @@ const onSubmit = () => {
                   :rules="[requiredValidator]"
                   :error-messages="errors.username"
                 />
-                 <div class="d-flex align-center flex-wrap justify-space-between mt-2">
-                  <RouterLink
-                    class="text-primary ms-2 "
-                    :to="{ name: 'login' }"
-                  >
-                    Back to login
-                  </RouterLink>
-                </div>
               </VCol>
 
               <!-- password -->
@@ -152,6 +144,14 @@ const onSubmit = () => {
                 >
                   Reset Password
                 </VBtn>
+                <div class="d-flex align-center flex-wrap justify-space-between mt-2">
+                  <RouterLink
+                    class="text-primary ms-2 "
+                    :to="{ name: 'login' }"
+                  >
+                    Back to login
+                  </RouterLink>
+                </div>
               </VCol>
             </VRow>
           </VForm>
