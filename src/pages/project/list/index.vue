@@ -26,6 +26,8 @@ const Projectpriority = ref()
 const projectCode = ref()
 const statusCode = ref()
 const statusData = ref()
+const projectDepartment = ref()
+const department = ref()
 const find = ref('')
 const findText = ref('')
 
@@ -49,6 +51,7 @@ const fetchProject = async (page, perPage, find) => {
         find: find,
         status: statusCode.value,
         project_id: projectCode.value,
+        department_id: department.value
       },
     })
 
@@ -98,6 +101,20 @@ const fetchPriority = async () => {
   }
   finally{showLoading.value = false}
 }
+const fetchDepartement = async () => {
+  showLoading.value = true
+  try {
+    const ret = await axiosIns.get('/projectDepartment', {
+    })
+
+    showLoading.value = false
+    projectDepartment.value = ret.data.data
+  } catch (error) {
+    console.log(error)
+    toast.error('Failed Load Data')
+  }
+  finally{showLoading.value = false}
+}
 
 const search = () => {
   projectStore.page = 1
@@ -108,6 +125,7 @@ const search = () => {
 watchEffect(() => {
   fetchProject(projectStore.page, projectStore.perPage, find.value),
   fetchStatus(),
+  fetchDepartement(),
   fetchPriority()
 })
 
@@ -513,32 +531,6 @@ const resolveAttachVariant = attachment => {
                 />
               </div>
 
-              <div
-                class="d-flex gap-4"
-                style="width: 10rem;"
-              >
-                <VSelect
-                  v-model="statusCode"
-                  :items="statusData"
-                  item-value="code"
-                  item-title="description"
-                  label="Status"
-                  clearable
-                />
-              </div>
-              <div
-                class="d-flex gap-4"
-                style="width: 10rem;"
-              >
-                <VSelect
-                  v-model="projectCode"
-                  :items="Projectpriority"
-                  item-value="code"
-                  item-title="description"
-                  label="Priority"
-                  clearable
-                />
-              </div>
               <VTextField 
                 v-model="findText"
                 label="Search"
@@ -555,10 +547,43 @@ const resolveAttachVariant = attachment => {
                 @closed="getClosed"
                 @saved="fetchProject(projectStore.page, projectStore.perPage, find.value)"
               />
-            </VCardText>
+              </VCardText>
+              <VCardText class="d-flex gap-4 flex-wrap">
+                <div style="width: 10rem;">
+                  <VSelect
+                    v-model="statusCode"
+                    :items="statusData"
+                    item-value="code"
+                    item-title="description"
+                    label="Status"
+                    clearable
+                  />
+                </div>
+
+                <div style="width: 10rem;">
+                  <VSelect
+                    v-model="projectCode"
+                    :items="Projectpriority"
+                    item-value="code"
+                    item-title="description"
+                    label="Priority"
+                    clearable
+                  />
+                </div>
+
+                <div style="width: 15rem;">
+                  <VSelect
+                    v-model="department"
+                    :items="projectDepartment"
+                    item-value="code"
+                    item-title="description"
+                    label="Department"
+                    clearable
+                  />
+                </div>
+              </VCardText>
           </VCol>
         </VRow>
-
         <VCardText>
           <VTable>
             <thead
