@@ -138,10 +138,10 @@ const onSubmit = () => {
           />
 
           <h5 class="text-h5 font-weight-semibold mb-1">
-            Welcome to {{ themeConfig.app.title }}! 👋🏻
+            Mengalami kendala saat login?
           </h5>
           <p class="mb-0">
-            Silakan tulis username Anda untuk me-reset password
+            Silakan tulis username dan email. Password baru akan dikirim ke email.
           </p>
         </VCardText>
 
