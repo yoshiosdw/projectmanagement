@@ -12,6 +12,7 @@ import authV2MaskLight from '@images/pages/misc-mask-light.png'
 import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
 import { requiredValidator } from '@validators'
+import { result } from 'lodash'
 import Swal from 'sweetalert2'
 import { VForm } from 'vuetify/components'
 
@@ -30,20 +31,26 @@ const errors = ref({
 
 const refVForm = ref()
 const username = ref('')
-const password = ref('')
+const email = ref('')
 
-const login = async () => {
+const emailValidator = value => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  return emailRegex.test(value) || 'Email tidak valid'
+}
+
+const resetPassword = async () => {
   loading.value = true
   try {
     const res = await axiosIns.post('/reset-password', {
       username: username.value,
+      email: email.value,
     })
 
     loading.value = false
 
     Swal.fire({
       title: 'Berhasil',
-      text: 'Password berhasil di-reset. Silakan cek email Anda.',
+      text: `Password berhasil di-reset dan dikirim ke ${res.data.email}.`,
       icon: 'success',
     }).then(() => {
       router.push('/login')
@@ -63,8 +70,28 @@ const login = async () => {
 
 const onSubmit = () => {
   refVForm.value?.validate().then(({ valid: isValid }) => {
-    if (isValid)
-      login()
+    if (isValid) {
+      Swal.fire({
+        title: 'LBG',
+        text: `Reset password akan dikirim ke email: ${email.value}. Anda yakin ingin melanjutkan?`,
+        icon: `question`,
+        showCancelButton: true,
+        confirmButtonColor: 'warning',
+        confirmButtonText: 'Ya, Lanjutkan!',
+        cancelButtonText: 'Batal',
+        cancelButtonColor: 'primary',
+        reverseButtons: true,
+        customClass: {
+          actions: 'my-swal-actions',
+          confirmButton: 'my-confirm-button',
+          cancelButton: 'my-cancel-button',
+        },
+      }).then(result => {
+        if (result.isConfirmed) {
+          resetPassword()
+        }
+      })
+    }
   })
 }
 </script>
@@ -124,7 +151,7 @@ const onSubmit = () => {
             @submit.prevent="onSubmit"
           >
             <VRow>
-              <!-- email -->
+              <!-- username -->
               <VCol cols="12">
                 <VTextField
                   v-model="username"
@@ -134,7 +161,16 @@ const onSubmit = () => {
                 />
               </VCol>
 
-              <!-- password -->
+              <!-- email -->
+              <VCol cols="12">
+                <VTextField
+                  v-model="email"
+                  label="Email"
+                  :rules="[requiredValidator, emailValidator]"
+                  :error-messages="errors.email"
+                />
+              </VCol>
+
               <VCol cols="12">
                 <VBtn
                   block
@@ -163,6 +199,17 @@ const onSubmit = () => {
 
 <style lang="scss">
 @use "@core/scss/template/pages/page-auth.scss";
+
+.my-swal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 3rem;
+}
+
+.my-confirm-button,
+.my-cancel-button {
+  min-width: 100px;
+}
 </style>
 
 <route lang="yaml">
