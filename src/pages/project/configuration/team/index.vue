@@ -190,7 +190,7 @@ const paginationData = computed(()=>{
                     icon
                     variant="none"
                     color="info"
-                    title="Delete"
+                    title="Edit"
                     size="22"
                   >
                     <Edit :header-id="data.id" />

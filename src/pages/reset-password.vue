@@ -12,6 +12,7 @@ import authV2MaskLight from '@images/pages/misc-mask-light.png'
 import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
 import { requiredValidator } from '@validators'
+import { result } from 'lodash'
 import Swal from 'sweetalert2'
 import { VForm } from 'vuetify/components'
 
@@ -30,41 +31,67 @@ const errors = ref({
 
 const refVForm = ref()
 const username = ref('')
-const password = ref('')
+const email = ref('')
 
-const login = async () => {
+const emailValidator = value => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  return emailRegex.test(value) || 'Email tidak valid'
+}
+
+const resetPassword = async () => {
   loading.value = true
   try {
-    const ret = await axiosIns.post('/login', {
-        username: username.value,
-        password: password.value
+    const res = await axiosIns.post('/reset-password', {
+      username: username.value,
+      email: email.value,
     })
-    console.log(ret);
-    const sinarjoUserAbilities = ret.data.data.ability
-    const sinarjoUserData = ret.data.data
-    const sinarjoAccessToken = ret.data.meta.token
-    loading.value = false
-    localStorage.setItem('sinarjoUserAbilities', JSON.stringify(sinarjoUserAbilities))
-    ability.update(sinarjoUserAbilities)
-    localStorage.setItem('sinarjoUserData', JSON.stringify(sinarjoUserData))
-    localStorage.setItem('sinarjoAccessToken', sinarjoAccessToken) 
 
-    router.replace(route.query.to ? String(route.query.to) : '/')
-  } catch (error) {
-    Swal.fire({
-      title: 'LBG',
-      text: 'Username atau password Anda salah',
-      icon: 'error'
-    })
     loading.value = false
-    console.log(error);
+
+    Swal.fire({
+      title: 'Berhasil',
+      text: `Password berhasil di-reset dan dikirim ke ${res.data.email}.`,
+      icon: 'success',
+    }).then(() => {
+      router.push('/login')
+    })
+  } catch (error) {
+    loading.value = false
+
+    Swal.fire({
+      title: 'Gagal',
+      text: error?.response?.data?.message || 'Terjadi kesalahan.',
+      icon: 'error',
+    })
+
+    console.log(error)
   }
 }
 
 const onSubmit = () => {
   refVForm.value?.validate().then(({ valid: isValid }) => {
-    if (isValid)
-      login()
+    if (isValid) {
+      Swal.fire({
+        title: 'LBG',
+        text: `Reset password akan dikirim ke email: ${email.value}. Anda yakin ingin melanjutkan?`,
+        icon: `question`,
+        showCancelButton: true,
+        confirmButtonColor: 'warning',
+        confirmButtonText: 'Ya, Lanjutkan!',
+        cancelButtonText: 'Batal',
+        cancelButtonColor: 'primary',
+        reverseButtons: true,
+        customClass: {
+          actions: 'my-swal-actions',
+          confirmButton: 'my-confirm-button',
+          cancelButton: 'my-cancel-button',
+        },
+      }).then(result => {
+        if (result.isConfirmed) {
+          resetPassword()
+        }
+      })
+    }
   })
 }
 </script>
@@ -111,10 +138,10 @@ const onSubmit = () => {
           />
 
           <h5 class="text-h5 font-weight-semibold mb-1">
-            Welcome to {{ themeConfig.app.title }}! 👋🏻
+            Mengalami kendala saat login?
           </h5>
           <p class="mb-0">
-            Please sign-in to your account and start the adventure
+            Silakan tulis username dan email. Password baru akan dikirim ke email.
           </p>
         </VCardText>
 
@@ -124,51 +151,42 @@ const onSubmit = () => {
             @submit.prevent="onSubmit"
           >
             <VRow>
-              <!-- email -->
+              <!-- username -->
               <VCol cols="12">
                 <VTextField
                   v-model="username"
                   label="Username"
                   :rules="[requiredValidator]"
+                  :error-messages="errors.username"
+                />
+              </VCol>
+
+              <!-- email -->
+              <VCol cols="12">
+                <VTextField
+                  v-model="email"
+                  label="Email"
+                  :rules="[requiredValidator, emailValidator]"
                   :error-messages="errors.email"
                 />
               </VCol>
 
-              <!-- password -->
               <VCol cols="12">
-                <VTextField
-                  v-model="password"
-                  label="Password"
-                  :rules="[requiredValidator]"
-                  :type="isPasswordVisible ? 'text' : 'password'"
-                  :error-messages="errors.password"
-                  :append-inner-icon="isPasswordVisible ? 'tabler-eye-off' : 'tabler-eye'"
-                  @click:append-inner="isPasswordVisible = !isPasswordVisible"
-                />
-
-                <div class="d-flex align-center flex-wrap justify-space-between mt-2 mb-4">
-                  
-                </div>
-
                 <VBtn
                   block
                   type="submit"
                   :loading="loading"
                   :disabled="loading"
                 >
-                  Login
+                  Reset Password
                 </VBtn>
-
-                <div class="d-flex align-center flex-wrap justify-space-between mt-2 mb-4">
-                  <span class="ms-2 mb-1">
-                    Tidak bisa login?
-                    <RouterLink
-                      class="text-primary"
-                      :to="{ name: 'reset-password' }"
-                    >
-                      Reset Password
-                    </RouterLink>
-                  </span>
+                <div class="d-flex align-center flex-wrap justify-space-between mt-2">
+                  <RouterLink
+                    class="text-primary ms-2 "
+                    :to="{ name: 'login' }"
+                  >
+                    Back to login
+                  </RouterLink>
                 </div>
               </VCol>
             </VRow>
@@ -181,6 +199,17 @@ const onSubmit = () => {
 
 <style lang="scss">
 @use "@core/scss/template/pages/page-auth.scss";
+
+.my-swal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 3rem;
+}
+
+.my-confirm-button,
+.my-cancel-button {
+  min-width: 100px;
+}
 </style>
 
 <route lang="yaml">
