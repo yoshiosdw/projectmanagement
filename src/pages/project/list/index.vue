@@ -53,11 +53,7 @@ const fetchProject = async (page, perPage, find) => {
         find: find,
         status: statusCode.value,
         project_id: projectCode.value,
-<<<<<<< HEAD
-        department_id: department.value,
-=======
         department_id: department.value
->>>>>>> e5a611524a9876de879e523616d5eb53e03c1cf8
       },
     })
 
@@ -146,13 +142,8 @@ const search = () => {
 watchEffect(() => {
   fetchProject(projectStore.page, projectStore.perPage, find.value),
   fetchStatus(),
-<<<<<<< HEAD
-  fetchPriority(),
-  fetchDepartment()
-=======
   fetchDepartement(),
   fetchPriority()
->>>>>>> e5a611524a9876de879e523616d5eb53e03c1cf8
 })
 
 const deleteData = async id => {
@@ -560,48 +551,6 @@ const resolveAttachVariant = attachment => {
                 />
               </div>
 
-<<<<<<< HEAD
-              <div
-                class="d-flex gap-4"
-                style="width: 10rem;"
-              >
-                <VSelect
-                  v-model="statusCode"
-                  :items="statusData"
-                  item-value="code"
-                  item-title="description"
-                  label="Status"
-                  clearable
-                />
-              </div>
-              <div
-                class="d-flex gap-4"
-                style="width: 10rem;"
-              >
-                <VSelect
-                  v-model="projectCode"
-                  :items="Projectpriority"
-                  item-value="code"
-                  item-title="description"
-                  label="Priority"
-                  clearable
-                />
-              </div>
-              <div
-                class="d-flex gap-4"
-                style="width: 10rem;"
-              >
-                <VSelect
-                  v-model="department"
-                  :items="ProjectDepartment"
-                  item-value="description"
-                  item-title="description"
-                  label="Department"
-                  clearable
-                />
-              </div>
-=======
->>>>>>> e5a611524a9876de879e523616d5eb53e03c1cf8
               <VTextField 
                 v-model="findText"
                 label="Search"
