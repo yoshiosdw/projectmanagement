@@ -27,7 +27,8 @@ const projectCode = ref()
 const statusCode = ref()
 const statusData = ref()
 const projectDepartment = ref()
-const department = ref()
+
+// const department = ref()
 const find = ref('')
 const findText = ref('')
 
@@ -53,7 +54,7 @@ const fetchProject = async (page, perPage, find) => {
         find: find,
         status: statusCode.value,
         project_id: projectCode.value,
-        department_id: department.value
+        department_id: department.value,
       },
     })
 
@@ -103,6 +104,7 @@ const fetchPriority = async () => {
   }
   finally{showLoading.value = false}
 }
+
 const fetchDepartement = async () => {
   showLoading.value = true
   try {
@@ -118,20 +120,6 @@ const fetchDepartement = async () => {
   finally{showLoading.value = false}
 }
 
-const fetchDepartment = async () => {
-  showLoading.value = true
-  try {
-    const ret = await axiosIns.get('/projectDepartment', {
-    })
-
-    showLoading.value = false
-    ProjectDepartment.value = ret.data.data
-  } catch (error) {
-    console.log(error)
-    toast.error('Failed Load Data')
-  }
-  finally{showLoading.value = false}
-}
 
 const search = () => {
   projectStore.page = 1
@@ -567,41 +555,41 @@ const resolveAttachVariant = attachment => {
                 @closed="getClosed"
                 @saved="fetchProject(projectStore.page, projectStore.perPage, find.value)"
               />
-              </VCardText>
-              <VCardText class="d-flex gap-4 flex-wrap">
-                <div style="width: 10rem;">
-                  <VSelect
-                    v-model="statusCode"
-                    :items="statusData"
-                    item-value="code"
-                    item-title="description"
-                    label="Status"
-                    clearable
-                  />
-                </div>
+            </VCardText>
+            <VCardText class="d-flex gap-4 flex-wrap">
+              <div style="width: 10rem;">
+                <VSelect
+                  v-model="statusCode"
+                  :items="statusData"
+                  item-value="code"
+                  item-title="description"
+                  label="Status"
+                  clearable
+                />
+              </div>
 
-                <div style="width: 10rem;">
-                  <VSelect
-                    v-model="projectCode"
-                    :items="Projectpriority"
-                    item-value="code"
-                    item-title="description"
-                    label="Priority"
-                    clearable
-                  />
-                </div>
+              <div style="width: 10rem;">
+                <VSelect
+                  v-model="projectCode"
+                  :items="Projectpriority"
+                  item-value="code"
+                  item-title="description"
+                  label="Priority"
+                  clearable
+                />
+              </div>
 
-                <div style="width: 15rem;">
-                  <VSelect
-                    v-model="department"
-                    :items="projectDepartment"
-                    item-value="code"
-                    item-title="description"
-                    label="Department"
-                    clearable
-                  />
-                </div>
-              </VCardText>
+              <div style="width: 15rem;">
+                <VSelect
+                  v-model="department"
+                  :items="projectDepartment"
+                  item-value="code"
+                  item-title="description"
+                  label="Department"
+                  clearable
+                />
+              </div>
+            </VCardText>
           </VCol>
         </VRow>
         <VCardText>
