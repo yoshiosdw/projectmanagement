@@ -36,6 +36,8 @@ const getEdit = ref()
 const isEdit = ref(false)
 
 const ticketTransferId = ref(route.query.id)
+const ProjectDepartment = ref()
+const department = ref()
 
 // const getStatus = ref(false)
 
@@ -49,6 +51,7 @@ const fetchProject = async (page, perPage, find) => {
         find: find,
         status: statusCode.value,
         project_id: projectCode.value,
+        department_id: department.value,
       },
     })
 
@@ -99,6 +102,21 @@ const fetchPriority = async () => {
   finally{showLoading.value = false}
 }
 
+const fetchDepartment = async () => {
+  showLoading.value = true
+  try {
+    const ret = await axiosIns.get('/projectDepartment', {
+    })
+
+    showLoading.value = false
+    ProjectDepartment.value = ret.data.data
+  } catch (error) {
+    console.log(error)
+    toast.error('Failed Load Data')
+  }
+  finally{showLoading.value = false}
+}
+
 const search = () => {
   projectStore.page = 1
   projectStore.perPage = 10
@@ -108,7 +126,8 @@ const search = () => {
 watchEffect(() => {
   fetchProject(projectStore.page, projectStore.perPage, find.value),
   fetchStatus(),
-  fetchPriority()
+  fetchPriority(),
+  fetchDepartment()
 })
 
 const deleteData = async id => {
@@ -246,7 +265,7 @@ const btnEndHandler = id => {
     icon: 'question',
     input: 'textarea',
     inputAttributes: {
-      style: 'height: 60px;'
+      style: 'height: 60px;',
     },
     inputPlaceholder: 'Enter a note (optional)...',
     showCancelButton: true,
@@ -255,8 +274,9 @@ const btnEndHandler = id => {
     confirmButtonText: 'Yes, End Now!',
   }).then(ret => {
     if(ret.isConfirmed) {
-      const note = ret.value ?? '';
-      endProject(id, note);
+      const note = ret.value ?? ''
+
+      endProject(id, note)
     }
   })
 }
@@ -426,7 +446,7 @@ const paginationData = computed(()=>{
 //   // jobOrderStore.task= task //misal diganti dengan const statusCode
 // }
 const downloadFile = async filename => {
-  showLoading.value = true;
+  showLoading.value = true
   try {
     const params = {
       filename: filename,
@@ -497,9 +517,11 @@ const resolveAttachVariant = attachment => {
 
 <template>
   <VRow>
-   <!-- <VCol cols="12">
+    <!--
+      <VCol cols="12">
       <StatusProject @statusproject="handleStatusProject"/>
-    </VCol> -->
+      </VCol> 
+    -->
     <VCol cols="12">
       <VOverlay v-model="showLoading" />
       <VCard :loading="showLoading">
@@ -536,6 +558,19 @@ const resolveAttachVariant = attachment => {
                   item-value="code"
                   item-title="description"
                   label="Priority"
+                  clearable
+                />
+              </div>
+              <div
+                class="d-flex gap-4"
+                style="width: 10rem;"
+              >
+                <VSelect
+                  v-model="department"
+                  :items="ProjectDepartment"
+                  item-value="description"
+                  item-title="description"
+                  label="Department"
                   clearable
                 />
               </div>
@@ -666,18 +701,18 @@ const resolveAttachVariant = attachment => {
                 >
                   Actual Duration (Day)
                 </th>
-                  <th
-                    scope="col"
-                    class="text-no-wrap"
-                  >
-                    Attachment
-                  </th>
-                  <th
-                    scope="col"
-                    class="text-no-wrap"
-                  >
-                    Note
-                  </th>
+                <th
+                  scope="col"
+                  class="text-no-wrap"
+                >
+                  Attachment
+                </th>
+                <th
+                  scope="col"
+                  class="text-no-wrap"
+                >
+                  Note
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -888,26 +923,26 @@ const resolveAttachVariant = attachment => {
                 <td style="text-align: right;">
                   {{ data.actual_duration }}
                 </td>
-                  <td
-                    style="word-wrap: break-word;"
-                    class="text-wrap"
+                <td
+                  style="word-wrap: break-word;"
+                  class="text-wrap"
+                >
+                  <div
+                    class="d-flex flex-column text-wrap"
                   >
-                    <div
-                      class="d-flex flex-column text-wrap"
-                      >
-                      <VChip 
+                    <VChip 
                       v-if="data.attachment !== null"
                       :color="resolveAttachVariant(data.attachment).color"
                       size="small"
                       @click="downloadFile(data.attachment)"
-                      >
-                        {{ truncateText(data.attachment) }}
-                      </VChip>
-                      <template v-else>
-                        {{ data.attachment }}
-                      </template>
-                    </div>
-                  </td>
+                    >
+                      {{ truncateText(data.attachment) }}
+                    </VChip>
+                    <template v-else>
+                      {{ data.attachment }}
+                    </template>
+                  </div>
+                </td>
                 <td style="white-space: normal; overflow-wrap: break-word; min-width: 300px;">
                   {{ data.note }}
                 </td>
