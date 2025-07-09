@@ -1,5 +1,6 @@
 <script setup>
 import SjbImage from '@/assets/images/sjb.png'
+import { getToken, messaging } from '@/firebase'
 import axiosIns from '@/plugins/axios'
 import { useAppAbility } from '@/plugins/casl/useAppAbility'
 import { useGenerateImageVariant } from '@core/composable/useGenerateImageVariant'
@@ -35,35 +36,70 @@ const password = ref('')
 const login = async () => {
   loading.value = true
   try {
-    const ret = await axiosIns.post('/login', {
-        username: username.value,
-        password: password.value
+    const response = await axiosIns.post('/login', {
+      username: username.value,
+      password: password.value,
     })
-    console.log(ret);
-    const sinarjoUserAbilities = ret.data.data.ability
-    const sinarjoUserData = ret.data.data
-    const sinarjoAccessToken = ret.data.meta.token
-    loading.value = false
-    localStorage.setItem('sinarjoUserAbilities', JSON.stringify(sinarjoUserAbilities))
-    ability.update(sinarjoUserAbilities)
-    localStorage.setItem('sinarjoUserData', JSON.stringify(sinarjoUserData))
-    localStorage.setItem('sinarjoAccessToken', sinarjoAccessToken) 
 
+    const sinarjoUserData = response.data.data
+    const sinarjoUserAbilities = sinarjoUserData.ability
+    const sinarjoAccessToken = response.data.meta.token
+
+    // Simpan ke localStorage
+    localStorage.setItem('sinarjoUserAbilities', JSON.stringify(sinarjoUserAbilities))
+    localStorage.setItem('sinarjoUserData', JSON.stringify(sinarjoUserData))
+    localStorage.setItem('sinarjoAccessToken', sinarjoAccessToken)
+
+    ability.update(sinarjoUserAbilities)
+    console.log('login berhasil')
+
+    // FCM: Minta izin dan dapatkan token
+    const permission = await Notification.requestPermission()
+    if (permission === 'granted' && 'serviceWorker' in navigator) {
+      try {
+        const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js')
+
+        console.log('✅ Service worker registered:', registration)
+
+        const fcmToken = await getToken(messaging, {
+          vapidKey: 'BFAwJ1Z_wnsBjBqW3N5_XmuXcAJi1NDq6PUL3xM1d9wQMRZDMjLD3xyA8P0VbkGwDp8s9cezLQMbWsleWRHqUs8',
+          serviceWorkerRegistration: registration,
+        })
+        
+        console.log('fcmToken', fcmToken)
+
+        if (fcmToken) {
+          await axiosIns.post('/update/fcm-token', {
+            fcm_token: fcmToken,
+          })
+          console.log('📲 FCM token terkirim:', fcmToken)
+        } else {
+          console.warn('⚠️ FCM token tidak tersedia')
+        }
+      } catch (err) {
+        console.error('❌ Gagal mendapatkan token FCM:', err)
+      }
+    } else {
+      console.warn('🔕 Notifikasi tidak diizinkan oleh user')
+    }
+
+    // Redirect
     router.replace(route.query.to ? String(route.query.to) : '/')
   } catch (error) {
     Swal.fire({
       title: 'LBG',
       text: 'Username atau password Anda salah',
-      icon: 'error'
+      icon: 'error',
     })
+    console.error('❌ Login gagal:', error)
+  } finally {
     loading.value = false
-    console.log(error);
   }
 }
 
 const onSubmit = () => {
-  refVForm.value?.validate().then(({ valid: isValid }) => {
-    if (isValid)
+  refVForm.value?.validate().then(({ valid }) => {
+    if (valid)
       login()
   })
 }
@@ -146,9 +182,7 @@ const onSubmit = () => {
                   @click:append-inner="isPasswordVisible = !isPasswordVisible"
                 />
 
-                <div class="d-flex align-center flex-wrap justify-space-between mt-2 mb-4">
-                  
-                </div>
+                <div class="d-flex align-center flex-wrap justify-space-between mt-2 mb-4" />
 
                 <VBtn
                   block

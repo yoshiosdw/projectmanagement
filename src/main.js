@@ -25,6 +25,8 @@ import Pusher from 'pusher-js'
 import Toast, { POSITION, useToast } from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
 import socket from './socket'
+import { onMessage } from 'firebase/messaging'
+import { messaging } from '@/firebase'
 
 
 let defaultOptions = { treeName: 'blocks-tree' }
@@ -99,6 +101,22 @@ const toast = useToast()
 //     status: 0,
 //   })
 // })
+// onMessage(messaging, payload => {
+//   console.log('📨 FCM message received in foreground:', payload)
+
+//   const title = payload.notification?.title || 'Notifikasi'
+//   const body = payload.notification?.body || 'Ada pesan baru'
+//   const link = payload.fcmOptions?.link || '/' // atau kosong kalau belum ada
+
+//   toast.info(`${title}: ${body}`, {
+//     timeout: 20000,
+//     onClick: () => {
+//       // router.push(link) // 🔗 sementara dikomentari dulu
+//     },
+//     toastClassName: 'toast-notification',
+//   })
+// })
+
 socket.on("notifSAT", data => {
   console.log("🔍 processed_by_sat:", data?.processed_by)
 

@@ -1,9 +1,13 @@
 import axios from 'axios'
+import router from '@/router'
+import Toast, { POSITION, useToast } from 'vue-toastification'
+
 
 const axiosIns = axios.create({
-  // baseURL: 'http://localhost:8082/api',
+  // baseURL: 'http://localhost:8083/api',
+  baseURL: 'https://89pkfd8h-8083.asse.devtunnels.ms/api',
   
-  baseURL: 'http://100.100.4.200:82/sinarjoyoboyo-api/api',
+  // baseURL: 'http://100.100.4.200:82/sinarjoyoboyo-api/api',
 
   // baseURL: 'http://100.100.0.26/sinarjoyoboyo-api/api',
   
@@ -26,6 +30,8 @@ axiosIns.interceptors.request.use(config => {
 }, error => {
   return Promise.reject(error)
 })
+
+const toast = useToast()
 
 axiosIns.interceptors.response.use(
   response => {
