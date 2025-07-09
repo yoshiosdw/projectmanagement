@@ -5,7 +5,7 @@ import Toast, { POSITION, useToast } from 'vue-toastification'
 
 const axiosIns = axios.create({
   // baseURL: 'http://localhost:8083/api',
-  baseURL: 'https://89pkfd8h-8083.asse.devtunnels.ms/api',
+   baseURL: ' https://d60240d5e48a.ngrok-free.app/api',
   
   // baseURL: 'http://100.100.4.200:82/sinarjoyoboyo-api/api',
 
